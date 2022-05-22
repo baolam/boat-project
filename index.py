@@ -25,6 +25,7 @@ def socket():
   server.connect(SERVER_ADDRESS, namespaces=NAMESPACE)
   
 c = 0
+prev_target = None
 target = None
 
 threading.Thread(name="socket", target=socket, daemon=True).start()
@@ -35,10 +36,11 @@ while True:
     handle.is_target = False
     
     if target == None:
-      # Cần xử lí
+      # Đổi mode thành tự động
+      # handle.set_mode(2)
       pass
-    
-    handle.update_coordinates(target)
+    else:
+      handle.update_coordinates(target)
     
     coordinates = classify(frame)
     r = handle.calc_classify(coordinates)
@@ -49,4 +51,4 @@ while True:
     
     # Phẩn xử lí tọa độ mới
     
-  handle.run()    
+  handle.run(target)    

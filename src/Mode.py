@@ -6,7 +6,7 @@ from .DepthMeasurement import DepthMeasureMent
 from .MatrixPoint import MatrixPoint
 
 class Mode:
-  def __init__(self, ser : serial.Serial, gps : serial.Serial, width, height, ws = 1.5, hs = 0.8):
+  def __init__(self, ser : serial.Serial, gps : serial.Serial, width, height, ws = 1.0, hs = 1.0):
     self.measurement = DepthMeasureMent()
     self.angle = Angle(width, height)
     self.matrixpoint = MatrixPoint(ws, hs)
@@ -20,20 +20,33 @@ class Mode:
     threading.Thread(name="arduino", target=self.__uart_arduino, daemon=True).start()
     threading.Thread(name="gps", target=self.__uart_gps, daemon=True).start()
     
-  def run(self):
-    if len(self.garbages) == 0:
-      return
+  def run(self, target):
+    if len(self.garbages) == 0 or target == None:
+      # Chuyển đổi chế độ tự động
+      trace, st = self.matrixpoint.bfs_exp_0_nearest()
+      t = trace[len(trace) - 1]
+      if st == False:
+        # Kết thúc hành trình, về nhà
+        house = self.matrixpoint.four_pos_matrix[0][0]["tl"]
+        house = [house["lng"], house["lat"]]
+        
+      
+    # if self.__mode == 0:
+    #   # Chế độ tự động
+    #   pass
+    # elif self.__mode == 1:
+    #   # Chế độ thủ công
+    #   pass
+    # else:
+    #   # Chế độ ngẫu nhiên
+    #   pass
+    # Lệnh điều khiển
+    # --> Gửi tới arduino
+    # Lệnh gửi tới arduino
+    # R;motor_1;motor_2;angle#
     
-    if self.__mode == 0:
-      # Chế độ tự động
-      pass
-    elif self.__mode == 1:
-      # Chế độ thủ công
-      pass
-    else:
-      # Chế độ ngẫu nhiên
-      pass
-  
+    return False 
+    
   def calc_classify(self, clss : List[tuple]):
     r = []
          

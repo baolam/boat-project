@@ -15,8 +15,8 @@ def change_to_lng(lat, miles):
 # Lng --> Trục X
 # Lat --> Trục Y
 class MatrixPoint:
-  I = [1, 0, -1, 0]
-  J = [0, -1, 0, 1]
+  I = [1, 0, -1, 0, 1, -1, -1, 1]
+  J = [0, -1, 0, 1, 1, 1, -1, -1]
   
   def __init__(self, ws, hs, mws = 100, mwh = 100):
     assert mws % ws == 0
