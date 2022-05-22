@@ -29,13 +29,16 @@ class Mode:
         # Kết thúc hành trình, về nhà
         house = self.matrixpoint.four_pos_matrix[0][0]["tl"]
         house = [house["lng"], house["lat"]]
-        deg, left_right = self.matrixpoint.backward(target, prev_target)
+        deg, left_right = self.matrixpoint.backward(house, prev_target)
         return False
+      else:
+        h = self.matrixpoint.four_pos_matrix[t[0]][t[1]]["tl"]
+        deg, left_right = self.matrixpoint.backward(h, prev_target)
     self.target = target
     if self.target["dis"] < 0:
       # Yêu cầu đổi em khác
       return True
-    return False
+    
     # if self.__mode == 0:
     #   # Chế độ tự động
     #   pass
