@@ -2,6 +2,7 @@ import math
 import serial
 import threading
 import pynmea2
+import time
 from .Angle import Angle
 from .DepthMeasurement import DepthMeasureMent
 from .MatrixPoint import MatrixPoint
@@ -95,6 +96,10 @@ class Mode:
     return e["distance"]
   
   def __uart_arduino(self):
+    time.sleep(3)
+    self.arduino.write(bytes("Arduino ưi! Bạn còn sống không"))
+    time.sleep(2)
+    
     while True:
       # Chạy nhận dữ liệu từ Arduino
       if self.arduino.in_waiting:
