@@ -1,6 +1,7 @@
 import math
 import serial
 import threading
+import pynmea2
 from .Angle import Angle
 from .DepthMeasurement import DepthMeasureMent
 from .MatrixPoint import MatrixPoint
@@ -13,14 +14,13 @@ class Mode:
     self.arduino = ser
     self.gps = gps
 
-    self.__mode = 0
     self.is_target = False
     self.garbages = []
     
     threading.Thread(name="arduino", target=self.__uart_arduino, daemon=True).start()
     threading.Thread(name="gps", target=self.__uart_gps, daemon=True).start()
     
-  def run(self, target):
+  def run(self, target, prev_target):
     if len(self.garbages) == 0 or target == None:
       # Chuyển đổi chế độ tự động
       trace, st = self.matrixpoint.bfs_exp_0_nearest()
@@ -29,8 +29,13 @@ class Mode:
         # Kết thúc hành trình, về nhà
         house = self.matrixpoint.four_pos_matrix[0][0]["tl"]
         house = [house["lng"], house["lat"]]
-        
-      
+        deg, left_right = self.matrixpoint.backward(target, prev_target)
+        return False
+    self.target = target
+    if self.target["dis"] < 0:
+      # Yêu cầu đổi em khác
+      return True
+    return False
     # if self.__mode == 0:
     #   # Chế độ tự động
     #   pass
@@ -100,8 +105,19 @@ class Mode:
           pass
   
   def __uart_gps(self):
+    is_started = False
     while True:
-      pass
-  
-  def set_mode(self, mode : int):
-    self.__mode = mode
+      pynmea2.NMEStreamReader()
+      newdata = self.gps.readline()
+      newdata = newdata.decode("utf-8")
+      if newdata[0:6] == "$GPRMC":
+        newmsg = pynmea2.parse(newdata)
+        lat = newmsg.latitude
+        lng = newmsg.longitude
+        
+        if not is_started:
+          self.matrixpoint(lat, lng)
+          is_started = True
+          
+        # Gọi hàm cập nhật vị trí
+        self.matrixpoint.forward(lng, lat, self.target)

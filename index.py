@@ -9,13 +9,25 @@ SERVER_ADDRESS = "http://boat-project.herokuapp.com"
 NAMESPACE = "/device"
 server = socketio.Client()
 
-arduino = serial.Serial()
-mp = MatrixPoint(1.5, 0.8)
+arduino = serial.Serial(
+  port = "/dev/ttyACM0",
+  baudrate=9600,
+  parity=serial.PARITY_NONE,
+  stopbits=serial.STOPBITS_ONE,
+  bytesize=serial.EIGHTBITS,
+  timeout=1
+)
+
+gps = serial.Serial(
+  port = "/dev/ttyACM1",
+  baudrate=9600,
+  timeout=0.5
+)
 
 video = cv2.VideoCapture(0)
 width = 500
 height = 500
-handle = Mode(arduino, width, height)
+handle = Mode(arduino, gps, width, height)
 
 def classify(img):
   # Tạo kết quả nhận dạng :>>
@@ -45,10 +57,11 @@ while True:
     coordinates = classify(frame)
     r = handle.calc_classify(coordinates)
     
+    prev_target = target
     target = r.pop(0)
     handle.garbages += r
     handle.sort()
     
-    # Phẩn xử lí tọa độ mới
-    
-  handle.run(target)    
+  if handle.run(target, prev_target):
+    prev_target = target
+    target = handle.garbages.pop(0)    

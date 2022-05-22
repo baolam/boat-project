@@ -75,7 +75,7 @@ class MatrixPoint:
         return True
     return False
   
-  def forward(self, lng, lat):
+  def forward(self, lng, lat, target):
     self.lng = lng
     self.lat = lat
     
@@ -89,6 +89,8 @@ class MatrixPoint:
           self.matrix[new_i][new_j] = 1
           self.current_pos = [new_i, new_j]
           self.c += 1
+          if target != None:
+            target["dis"] -= self.ws
           return
   
   def bfs_exp_0_nearest(self):

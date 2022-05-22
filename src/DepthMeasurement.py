@@ -15,6 +15,3 @@ class DepthMeasureMent:
     """
     return (self.focal_length * w) \
     / (self.W + self.espilon)
-    
-  def check_goal(self, distance, wh):
-    pass
