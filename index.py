@@ -3,17 +3,19 @@ import cv2
 import serial
 import threading
 from src.Mode import Mode
+from src.MatrixPoint import MatrixPoint
 
 SERVER_ADDRESS = "http://boat-project.herokuapp.com"
 NAMESPACE = "/device"
 server = socketio.Client()
 
-ser = serial.Serial()
+arduino = serial.Serial()
+mp = MatrixPoint(1.5, 0.8)
 
 video = cv2.VideoCapture(0)
 width = 500
 height = 500
-handle = Mode(ser, width, height)
+handle = Mode(arduino, width, height)
 
 def classify(img):
   # Tạo kết quả nhận dạng :>>

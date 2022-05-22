@@ -3,18 +3,22 @@ import serial
 import threading
 from .Angle import Angle
 from .DepthMeasurement import DepthMeasureMent
+from .MatrixPoint import MatrixPoint
 
 class Mode:
-  def __init__(self, ser : serial.Serial ,width, height):
+  def __init__(self, ser : serial.Serial, gps : serial.Serial, width, height, ws = 1.5, hs = 0.8):
     self.measurement = DepthMeasureMent()
     self.angle = Angle(width, height)
-    self.ser = ser
+    self.matrixpoint = MatrixPoint(ws, hs)
+    self.arduino = ser
+    self.gps = gps
 
     self.__mode = 0
     self.is_target = False
     self.garbages = []
     
-    threading.Thread(name="uart", target=self.__uart, daemon=True).start()
+    threading.Thread(name="arduino", target=self.__uart_arduino, daemon=True).start()
+    threading.Thread(name="gps", target=self.__uart_gps, daemon=True).start()
     
   def run(self):
     if len(self.garbages) == 0:
@@ -69,10 +73,22 @@ class Mode:
   def __sort_element(self, e : dict):
     return e["distance"]
   
-  def __uart(self):
+  def __uart_arduino(self):
     while True:
       # Chạy nhận dữ liệu từ Arduino
+      if self.arduino.in_waiting:
+        received_data = self.arduino.readline().strip() \
+          .replace('\r\n', '').split(';')
+        if received_data[0] == "lnglat":
+          lng, lat = map(float, received_data[1:])
+          self.matrixpoint(lng, lat)
+        if received_data[0] == "env":
+          # Dữ liệu môi trường
+          pass
+  
+  def __uart_gps(self):
+    while True:
       pass
-    
+  
   def set_mode(self, mode : int):
     self.__mode = mode
