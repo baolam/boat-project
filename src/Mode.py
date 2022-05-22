@@ -1,14 +1,17 @@
 import math
 import serial
 import threading
+import socketio
+
 from .Angle import Angle
 from .DepthMeasurement import DepthMeasureMent
 
 class Mode:
-  def __init__(self, ser : serial.Serial ,width, height):
+  def __init__(self, arduino : serial.Serial, cli : socketio.Client, width : int, height : int):
     self.measurement = DepthMeasureMent()
     self.angle = Angle(width, height)
-    self.ser = ser
+    self.arduino = arduino
+    self.cli = cli
 
     self.__mode = 0
     self.is_target = False
@@ -70,9 +73,18 @@ class Mode:
     return e["distance"]
   
   def __uart(self):
+    arduino = self.arduino
+    cli = self.cli
+    
     while True:
       # Chạy nhận dữ liệu từ Arduino
-      pass
-    
+      if arduino.in_waiting > 0:
+          received_data = arduino.readline().decode('utf-8').rstrip()
+          received_data = received_data.replace('\r\n')
+          received_data = received_data.split('@')
+          lat, lng, ntu, tds, battery, speed = [float(i) for i in received_data]
+          
+          
+        
   def set_mode(self, mode : int):
     self.__mode = mode
