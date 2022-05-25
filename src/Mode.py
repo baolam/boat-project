@@ -1,14 +1,20 @@
 import math
 import serial
 import threading
+<<<<<<< HEAD
 import pynmea2
 import time
+=======
+import socketio
+
+>>>>>>> e546fad6b73ac41fd6f6f4dc519b74e7f8d1d2ff
 from .Angle import Angle
 from .DepthMeasurement import DepthMeasureMent
 from .MatrixPoint import MatrixPoint
 from typing import List
 
 class Mode:
+<<<<<<< HEAD
   def __init__(self, ser : serial.Serial, gps : serial.Serial, width, height, ws = 1.0, hs = 1.0):
     self.measurement = DepthMeasureMent()
     self.angle = Angle(width, height)
@@ -16,6 +22,15 @@ class Mode:
     self.arduino = ser
     self.gps = gps  
     self.motor = 100
+=======
+  def __init__(self, arduino : serial.Serial, cli : socketio.Client, width : int, height : int):
+    self.measurement = DepthMeasureMent()
+    self.angle = Angle(width, height)
+    self.arduino = arduino
+    self.cli = cli
+
+    self.__mode = 0
+>>>>>>> e546fad6b73ac41fd6f6f4dc519b74e7f8d1d2ff
     self.is_target = False
     self.garbages = []
     self.is_ok = False
@@ -103,6 +118,7 @@ class Mode:
   def __sort_element(self, e : dict):
     return e["distance"]
   
+<<<<<<< HEAD
   def __uart_arduino(self):
     time.sleep(3)
     self.arduino.write(bytes("Arduino ưi! Bạn còn sống không", "utf-8"))
@@ -135,3 +151,21 @@ class Mode:
           
         # Gọi hàm cập nhật vị trí
         self.matrixpoint.forward(lng, lat, self.target)
+=======
+  def __uart(self):
+    arduino = self.arduino
+    cli = self.cli
+    
+    while True:
+      # Chạy nhận dữ liệu từ Arduino
+      if arduino.in_waiting > 0:
+          received_data = arduino.readline().decode('utf-8').rstrip()
+          received_data = received_data.replace('\r\n')
+          received_data = received_data.split('@')
+          lat, lng, ntu, tds, battery, speed = [float(i) for i in received_data]
+          
+          
+        
+  def set_mode(self, mode : int):
+    self.__mode = mode
+>>>>>>> e546fad6b73ac41fd6f6f4dc519b74e7f8d1d2ff
