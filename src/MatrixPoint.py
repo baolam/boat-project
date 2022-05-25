@@ -18,7 +18,7 @@ class MatrixPoint:
   I = [1, 0, -1, 0, 1, -1, -1, 1]
   J = [0, -1, 0, 1, 1, 1, -1, -1]
   
-  def __init__(self, ws, hs, mws = 100, mwh = 100):
+  def __init__(self, ws, hs, mws = 100, mhs = 100):
     assert mws % ws == 0
     assert mhs % hs == 0
     
@@ -35,6 +35,8 @@ class MatrixPoint:
     
     self.lng = None
     self.lat = None
+    
+    self.current_pos = [0, 0]
     
   def __call__(self, lat : float, lng : float):
     self.klng = change_to_lng(lat, self.ws)
@@ -58,10 +60,11 @@ class MatrixPoint:
           "tl" : self.__build_ls_latlng(tx, ty),
           "br" : self.__build_ls_latlng(tx + self.klng, ty + self.klat)
         })
+      self.four_pos_matrix.append(t)
       self.matrix.append([0] * self.y)
       lat += self.klat
     
-    self.current_pos = [0, 0]
+    
     self.matrix[0][0] = 1
     self.c = 1
     
@@ -97,7 +100,8 @@ class MatrixPoint:
     # BFS tìm điểm có tọa độ là 0 (hiểu là chưa tới)
     visited = []
     for __ in range(self.x):
-      visited = [[False] * self.y]
+      visited.append([False] * self.y)
+    
     
     trace = [self.current_pos]
     visited[self.current_pos[0]][self.current_pos[1]] = True
@@ -108,6 +112,7 @@ class MatrixPoint:
         for j in MatrixPoint.J:
           ci = i_ + i
           cj = j_ + j
+          print(ci, cj)
           if ci >= 0 and ci <= self.x \
           and cj >= 0 and cj <= self.y \
           and visited[ci][cj] == False:
@@ -125,11 +130,14 @@ class MatrixPoint:
       return False
     
     # Hàm tìm kiếm tọa độ đỉnh 0 gần nhất
-    st = __bfs(i_, j_, trace, visited)
+    st = __bfs(self.current_pos[0], self.current_pos[1], trace, visited)
+    print (st, trace)
     return trace, st
   
   def backward(self, target, prev_target):
     # Tính toán góc quay
+    if prev_target == None:
+        return [0, False]
     xa, ya = self.lng, self.lat
     xb, yb = target
     xc, yc = prev_target

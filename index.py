@@ -30,10 +30,24 @@ height = 500
 handle = Mode(arduino, gps, width, height)
 
 def classify(img):
-  # Tạo kết quả nhận dạng :>>
-  pass
+    cv2.imwrite("t.jpg", img)
+    with open("t.jpg", mode="rb") as f:
+        b = base64.b64encode(f.read())
+    b = str(b)
+    b = b[2:len(b)-1]
+    
+    state = requests.post(SERVER_ADDRESS, json={'base64': b})
+    print(state)
 
-def socket():
+def set_speed(speed):    
+  handle.set_speed(speed)
+
+def direction(left_right):
+    handle.turnlr(left_right)
+    
+def socket():  
+  server.on("speed", handler=set_speed, namespace=NAMESPACE)  
+  server.on("direction", handler=direction, namespace=NAMESPACE)
   server.connect(SERVER_ADDRESS, namespaces=NAMESPACE)
   
 c = 0
@@ -62,6 +76,6 @@ while True:
     handle.garbages += r
     handle.sort()
     
-  if handle.run(target, prev_target):
+  if handle.is_ok and handle.run(target, prev_target):
     prev_target = target
     target = handle.garbages.pop(0)    
