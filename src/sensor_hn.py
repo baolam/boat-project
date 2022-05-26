@@ -1,10 +1,16 @@
 from typing import List
+import RPi.GPIO as GPIO
 
 # Quy định chân
 # 0 --> trái
 # 1 --> phải
 # 2 --> thẳng
-PINS = []
+
+GPIO.setmode(GPIO.BCM)
+PINS = [17, 27, 22]
+
+for i in PINS:
+  GPIO.setup(i, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 def read() -> List[bool]:
   """Đọc cảm biến hồng ngoại
@@ -14,6 +20,6 @@ def read() -> List[bool]:
   """
   r = []
   for pin in PINS:
-    r.append(0)
+    r.append(GPIO.input(pin))
   r.append(0)
   return r
