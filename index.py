@@ -51,8 +51,7 @@ def journey(infor):
     matrixpoint.col_matrix = int(hb / matrixpoint.h)
     matrixpoint(matrixpoint.lng_st, matrixpoint.lat_st)
 
-def control(con):
-  left = con["left_right"]
+def control(left):
   i, j = matrixpoint.current_pos
   if left and i >= 1:
     if matrixpoint.matrix[i-1][j] != MatrixPoint.WARNING_VC:
@@ -68,7 +67,7 @@ def run_socket():
   socket.on("speed", handler=speed, namespace=NAMESPACE)
   socket.on("classify", handler=classify, namespace=NAMESPACE)
   socket.on("journey", handler=journey, namespace=NAMESPACE)
-  socket.on("control", handler=control, namespace=NAMESPACE)
+  socket.on("direction", handler=control, namespace=NAMESPACE)
   socket.connect(SERVER, namespaces=NAMESPACE)
 
 threading.Thread(name="socket", target=run_socket, daemon=True).start()
