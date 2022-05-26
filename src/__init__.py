@@ -3,3 +3,4 @@ from .MatrixPoint import MatrixPoint
 from .Read import Read
 from .depthmeasurement import depthmeasurement
 from .classify import request_to_server
+from .control import control
