@@ -11,7 +11,8 @@ from src import depthmeasurement
 from src import control
 
 SERVER = "http://boat-project.herokuapp.com"
-NAMESPACE = ""
+NAMESPACE = "/device"
+
 arduino = serial.Serial(
   port = "/dev/ttyACM0",
   baudrate=9600,
