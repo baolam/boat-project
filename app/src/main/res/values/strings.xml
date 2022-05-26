@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Android-App-Boat-Project</string>
+    <string name="speed">Speed:</string>
+    <string name="home_gps"><u>Home GPS:</u></string>
+    <string name="default_speed">0m/s</string>
+    <string name="default_lat"><u>Lat: </u></string>
+    <string name="default_lng"><u>Lng: </u></string>
+    <string name="mode">Mode</string>
+    <string name="off">Off</string>
+    <string name="on">On</string>
+    <string name="auto">AUTO</string>
+    <string name="ctrl">CTRL</string>
+    <string name="free">FREE</string>
+    <string name="compass">Compass:…</string>
+    <string name="battery">Battery:…</string>
+    <string name="time">Time:…</string>
+    <string name="control_dashboard"><u>CONTROL DASHBOARD</u></string>
+    <string name="motor_speed">Motor speed:</string>
+    <string name="default_motor_speed">0%</string>
+    <string name="stop_btn">STOP</string>
+</resources>
