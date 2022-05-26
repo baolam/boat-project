@@ -1,0 +1,150 @@
+#######
+  # Trục Lng --> Trục Ox
+  # Trục Lat --> Trục Oy
+#######
+import serial
+import threading
+import pynmea2
+import time
+from .lnglat import change_to_lat, change_to_lng, latlng
+from .sensor_hn import read
+from .equation import create_linear_equation, angle_between_two_linears
+from .control import control
+
+def check_point_ctd(ti, tj, row_matrix, col_matrix):
+  return ti >= 0 and ti <= row_matrix \
+  and tj >= 0 and tj <= col_matrix
+
+class MatrixPoint:
+  I = [-1, 1, 0, 0] # Phiên mã (trái, phải, trên)
+  J = [0, 0, 1, -1] # Phiên mã (trái, phải, trên)
+  
+  WARNING_VC = 3 # Mã vật cản
+  VISITED = 1 # Mã đã duyệt
+  NOT_VISITED = 0 # Mã chưa duyệt
+  PRIORITY = 2 # Mã ưu tiên tới
+    
+  def __init__(self, gps : serial.Serial, arduino : serial.Serial, w = 1, h = 1, wb = 100, hb = 100):
+    assert wb % w == 0
+    assert hb % h == 0
+    
+    # Giả định w ứng với x
+    # Giả định h ứng với y
+    self.row_matrix = int(wb / w)
+    self.col_matrix = int(hb / h)
+    
+    self.w = w
+    self.h = h
+    
+    self.klng = None
+    self.klat = None
+    self.lng_st = None
+    self.lat_st = None
+    self.matrix = None
+    self.current_pos = [None, None]
+    self.prev = [None, None]
+    
+    self.gps = gps
+    self.arduino = arduino
+    self.motor = 100
+    self.is_trace = 0
+            
+    # Tiến trình chạy chung
+    threading.Thread(name="gps", target=self.__gps, daemon=True).start()
+    
+  def __call__(self, lng : float, lat : float):
+    # Gọi hàm này là lấy lng, lat làm tọa độ chuẩn
+    self.klat = change_to_lat(self.h)
+    self.klng = change_to_lng(lat, self.x)
+    self.lng_st = lng
+    self.lat_st = lat
+    
+    self.four_pos_mat = []
+    for __ in range(self.row_matrix):
+      self.matrix.append([MatrixPoint.NOT_VISITED] * self.col_matrix)
+    self.current_pos = [0, 0]
+  
+  def check_outpoint(self, lng, lat):
+    """Kiểm tra điểm đã rời khỏi ô hiện tại chưa
+
+    Args:
+      lng (_type_): _description_
+      lat (_type_): _description_
+
+    Returns:
+      _type_: _description_
+    """
+    i_, j_ = self.convert_lnglat_into_ij(lng, lat)
+    i, j = int(i_), int(j_)
+    return self.current_pos[0] != i and self.current_pos[1] != j, i_, j_
+  
+  def flood(self):
+    """Loang đánh dấu điều kiện (đánh dấu vật cản)
+    """
+    r = read()
+    i, j = self.current_pos
+    for code in range(3):
+      ti = i + MatrixPoint.I[code]
+      tj = j + MatrixPoint.J[code]
+      st = r[code]
+      if check_point_ctd(ti, tj, self.row_matrix, self.col_matrix) and st:
+        self.matrix[ti][tj] = MatrixPoint.WARNING_VC
+  
+  def trace(self, trace):
+    # Kích hoạt cho chương trình chạy theo hướng truy vết
+    self.is_trace = 1
+    
+    while len(trace) > 0:
+      if self.is_trace == 1:
+        target = trace.pop(0)
+        current_target = create_linear_equation(self.current_pos, target)
+        prev_current = create_linear_equation(self.prev, self.current_pos)
+        
+        deg = angle_between_two_linears(current_target, prev_current)
+        left_right = current_target[2] >= prev_current[2]
+        
+        control(self.arduino, 0, deg, left_right)
+        time.sleep(5.)
+        control(self.arduino, self.motor, 0, False)
+        
+        self.is_trace = 2
+    
+    self.is_trace = 0
+      
+  def convert_lnglat_into_ij(self, lng, lat):
+    """Chuyển đổi kinh độ vĩ độ thành các vị trí trên ma trận điểm
+
+    Args:
+      lng (_type_): _description_
+      lat (_type_): _description_
+
+    Returns:
+      _type_: _description_
+    """
+    return (lng - self.lng_st) / self.klng, (lat - self.lat_st) / self.klat
+  
+  def __gps(self):
+    is_started = False
+    
+    while True:
+      pynmea2.NMEAStreamReader()
+      newdata = self.gps.readline()
+      newdata = newdata.decode("utf-8")
+      if newdata[0:6] == "$GPRMC":
+        newmsg = pynmea2.parse(newdata)
+        lat = newmsg.latitude
+        lng = newmsg.longitude
+
+        if not is_started:
+          is_started = True
+          self.__call__(lng, lat)
+          
+        state, i, j = self.check_outpoint(lng, lat)
+        if state:
+          # Cập nhật lại tọa độ mới
+          self.prev = self.current_pos
+          self.current_pos[0] = int(i)
+          self.current_pos[1] = int(j)
+          self.matrix[self.current_pos[0]][self.current_pos[1]] = MatrixPoint.VISITED
+          self.flood()
+          self.is_trace = 1
