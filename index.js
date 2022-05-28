@@ -10,10 +10,19 @@ const PORT = process.env.PORT || 3000;
 
 const device = io.of("/device");
 const android = io.of("/android");
+const ai = io.of("/ai");
 
 android.on("connection", (socket) => {
   socket.on("evt", (res) => {
     device.sockets.emit("evt", res);
+  });
+
+  socket.on("speed", (res) => {
+    device.sockets.emit("speed", res);
+  });
+
+  socket.on("direction", (res) => {
+    device.sockets.emit("direction", res == 't' ? true : false);
   });
 });
 
@@ -21,6 +30,19 @@ device.on("connection", (socket) => {
   socket.on("record", (data) => {
     android.sockets.emit("record", data);
   });
+});
+
+ai.on("connection", (socket) => {
+  socket.on("resp", (inf) => {
+    device.sockets.emit("res_rec", inf);
+  });
+});
+
+app.use(express.urlencoded({ extended : false }));
+app.use(express.json());
+app.get("/", (req, res) => {
+  ai.sockets.emit("handle", req.body.base64);
+  res.status(200).send("OK");
 });
 
 server.listen(PORT, () => {
