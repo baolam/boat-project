@@ -31,11 +31,14 @@ def bfs_get_x_nearest(matrix : List[List[int]], x : int, i : int, j : int):
   
   visited[i][j] = True
   trace.append([i, j])
-  
+
   def f(ti, tj):
     global x
     return matrix[ti][tj] == x
   
+  if f(i, j):
+    return True, trace
+    
   st = bfs(trace, visited, matrix, i, j, f)
   return st, trace
 
@@ -53,6 +56,9 @@ def goes_to_home(matrix : List[List[int]], i : int, j : int):
   
   def f(ti, tj):
     return ti == 0 and tj == 0
+  
+  if f(i, j):
+    return True, trace
   
   st = bfs(trace, visited, matrix, i, j, f)
   return st, trace

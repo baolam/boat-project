@@ -35,6 +35,8 @@ class MatrixPoint:
     
     self.w = w
     self.h = h
+    self.meet = 0 # Biến lưu tổng số lần nhận dạng rác
+    self.is_full = 2500
     
     self.klng = None
     self.klat = None
