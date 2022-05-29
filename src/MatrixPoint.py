@@ -16,8 +16,8 @@ def check_point_ctd(ti, tj, row_matrix, col_matrix):
   and tj >= 0 and tj <= col_matrix
 
 class MatrixPoint:
-  I = [-1, 1, 0, 0] # Phiên mã (trái, phải, trên)
-  J = [0, 0, 1, -1] # Phiên mã (trái, phải, trên)
+  I = [0, 0, 1, -1] # Phiên mã (trái, phải, trên)
+  J = [1, -1, 0, 0] # Phiên mã (trái, phải, trên)
   
   WARNING_VC = 3 # Mã vật cản
   VISITED = 1 # Mã đã duyệt
