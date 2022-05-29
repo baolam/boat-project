@@ -100,13 +100,18 @@ while True:
     request_to_server(img, SERVER)
   if matrixpoint.is_trace == 0:
     i, j = matrixpoint.current_pos
-    st, trace = bfs_get_x_nearest(matrixpoint.matrix, MatrixPoint.PRIORITY, i, j)
-    if st:
-      threading.Thread(name="tracing", target=matrixpoint.trace, args=(trace,), daemon=True).start()
+    
+    if matrixpoint.meet >= matrixpoint.is_full:
+      st, trace = goes_to_home(matrixpoint.matrix, i, j)
+      threading.Thread(name="tracing", target=matrixpoint.trace, args=(trace,), daemon=True).start()      
     else:
-      st, trace = bfs_get_x_nearest(matrixpoint.matrix, MatrixPoint.NOT_VISITED, i, j)
+      st, trace = bfs_get_x_nearest(matrixpoint.matrix, MatrixPoint.PRIORITY, i, j)
       if st:
         threading.Thread(name="tracing", target=matrixpoint.trace, args=(trace,), daemon=True).start()
       else:
-        st, trace = goes_to_home(matrixpoint.matrix, i, j)
-        threading.Thread(name="tracing", target=matrixpoint.trace, args=(trace,), daemon=True).start()
+        st, trace = bfs_get_x_nearest(matrixpoint.matrix, MatrixPoint.NOT_VISITED, i, j)
+        if st:
+          threading.Thread(name="tracing", target=matrixpoint.trace, args=(trace,), daemon=True).start()
+        else:
+          st, trace = goes_to_home(matrixpoint.matrix, i, j)
+          threading.Thread(name="tracing", target=matrixpoint.trace, args=(trace,), daemon=True).start()
