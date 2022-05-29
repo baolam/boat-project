@@ -23,3 +23,6 @@ def read() -> List[bool]:
     r.append(int(not GPIO.input(pin)))
   r.append(0)
   return r
+
+# def read() -> List[bool]:
+#   return [0, 0, 0, 0]

@@ -10,8 +10,8 @@ def control(ser : serial.Serial, motors : int, deg : int, left_right : bool):
     deg (int): _description_
     left_right (bool): _description_
   """
-  if left_right:
+  if not left_right:
     deg = - deg
   n = str(motors) + ';' + str(motors) + ';' + str(deg) + ';#'
-  print (n)
+  # print (n)
   ser.write(bytes(n, "utf-8"))

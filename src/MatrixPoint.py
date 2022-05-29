@@ -65,6 +65,8 @@ class MatrixPoint:
     self.four_pos_mat = []
     for __ in range(self.row_matrix):
       self.matrix.append([MatrixPoint.NOT_VISITED] * self.col_matrix)
+      
+    self.matrix[0][0] = MatrixPoint.VISITED
     self.current_pos = [0, 0]
     self.prev = [0, 0]
   
@@ -99,7 +101,7 @@ class MatrixPoint:
     self.is_trace = 1
     
     while len(trace) > 0:
-      if self.is_trace == 1:
+      if self.is_trace == 1 and MatrixPoint.is_started:
         target = trace.pop(0)
         current_target = create_linear_equation(self.current_pos, target)
         prev_current = create_linear_equation(self.prev, self.current_pos)

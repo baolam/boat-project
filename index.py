@@ -19,6 +19,7 @@ NAMESPACE = "/device"
 
 arduino = serial.Serial(
   port = "/dev/ttyACM0",
+  # port = "COM6",
   baudrate=9600,
   parity=serial.PARITY_NONE,
   stopbits=serial.STOPBITS_ONE,
@@ -28,6 +29,7 @@ arduino = serial.Serial(
 
 gps = serial.Serial(
   port = "/dev/ttyACM2",
+  # port = "COM12",
   baudrate=9600,
   timeout=0.5  
 )
