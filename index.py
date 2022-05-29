@@ -31,7 +31,7 @@ gps = serial.Serial(
   baudrate=9600,
   timeout=0.5  
 )
-
+ 
 socket = socketio.Client()
 
 video = cv2.VideoCapture(0)

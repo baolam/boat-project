@@ -20,6 +20,6 @@ def read() -> List[bool]:
   """
   r = []
   for pin in PINS:
-    r.append(GPIO.input(pin))
+    r.append(int(not GPIO.input(pin)))
   r.append(0)
   return r
