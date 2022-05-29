@@ -1,7 +1,7 @@
 from typing import List
 from .MatrixPoint import MatrixPoint, check_point_ctd
 
-def bfs(trace, visited, matrix, i_, j_, f):
+def bfs(trace, visited, matrix, i_, j_, f, rows, cols):
   t = []
   for i in MatrixPoint.I:
     for j in MatrixPoint.J:
@@ -16,7 +16,7 @@ def bfs(trace, visited, matrix, i_, j_, f):
           return True
   while len(t) > 0:
     z = t.pop(0)
-    if __bfs(trace, visited, matrix, z[0], z[1], f):
+    if bfs(trace, visited, matrix, z[0], z[1], f, rows, cols):
       return True
   return False
   
@@ -33,13 +33,13 @@ def bfs_get_x_nearest(matrix : List[List[int]], x : int, i : int, j : int):
   trace.append([i, j])
 
   def f(ti, tj):
-    global x
+    #global x
     return matrix[ti][tj] == x
   
   if f(i, j):
     return True, trace
     
-  st = bfs(trace, visited, matrix, i, j, f)
+  st = bfs(trace, visited, matrix, i, j, f, rows, cols)
   return st, trace
 
 def goes_to_home(matrix : List[List[int]], i : int, j : int):
@@ -60,5 +60,5 @@ def goes_to_home(matrix : List[List[int]], i : int, j : int):
   if f(i, j):
     return True, trace
   
-  st = bfs(trace, visited, matrix, i, j, f)
+  st = bfs(trace, visited, matrix, i, j, f, rows, cols)
   return st, trace

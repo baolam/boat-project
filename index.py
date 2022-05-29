@@ -27,12 +27,13 @@ arduino = serial.Serial(
 )
 
 gps = serial.Serial(
-  port = "/dev/ttyACM1",
+  port = "/dev/ttyACM2",
   baudrate=9600,
   timeout=0.5  
 )
  
 socket = socketio.Client()
+call_priority = False
 
 video = cv2.VideoCapture(0)
 infor = Read(socket, arduino, NAMESPACE)
@@ -67,9 +68,12 @@ def control(left):
     control(arduino, 0, left)
   
 def classify(resp):
+  global call_priority
   print (resp)
   
   matrixpoint.is_full += len(resp)
+  if len(resp) != 0:
+    call_priority = True    
   # Vẽ vào ma trận điểm
   
   for x, y, w, h in resp:
@@ -97,17 +101,18 @@ while True:
   c += 1
   if c % 3 == 0:
     c = 0
-    request_to_server(img, SERVER)
-  if matrixpoint.is_trace == 0:
+    request_to_server(frame, SERVER)
+  if matrixpoint.is_trace == 0 and MatrixPoint.is_started:
     i, j = matrixpoint.current_pos
     
     if matrixpoint.meet >= matrixpoint.is_full:
       st, trace = goes_to_home(matrixpoint.matrix, i, j)
       threading.Thread(name="tracing", target=matrixpoint.trace, args=(trace,), daemon=True).start()      
     else:
-      st, trace = bfs_get_x_nearest(matrixpoint.matrix, MatrixPoint.PRIORITY, i, j)
-      if st:
-        threading.Thread(name="tracing", target=matrixpoint.trace, args=(trace,), daemon=True).start()
+      if call_priority:  
+        st, trace = bfs_get_x_nearest(matrixpoint.matrix, MatrixPoint.PRIORITY, i, j)
+        if st:
+          threading.Thread(name="tracing", target=matrixpoint.trace, args=(trace,), daemon=True).start()
       else:
         st, trace = bfs_get_x_nearest(matrixpoint.matrix, MatrixPoint.NOT_VISITED, i, j)
         if st:

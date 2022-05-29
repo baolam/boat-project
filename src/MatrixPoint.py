@@ -12,13 +12,14 @@ from .equation import create_linear_equation, angle_between_two_linears
 from .control import control
 
 def check_point_ctd(ti, tj, row_matrix, col_matrix):
-  return ti >= 0 and ti <= row_matrix \
-  and tj >= 0 and tj <= col_matrix
+  return ti >= 0 and ti <= row_matrix - 1 \
+  and tj >= 0 and tj <= col_matrix - 1
 
 class MatrixPoint:
   I = [0, 0, 1, -1] # Phiên mã (trái, phải, trên)
   J = [1, -1, 0, 0] # Phiên mã (trái, phải, trên)
   
+  is_started = False
   WARNING_VC = 3 # Mã vật cản
   VISITED = 1 # Mã đã duyệt
   NOT_VISITED = 0 # Mã chưa duyệt
@@ -42,7 +43,7 @@ class MatrixPoint:
     self.klat = None
     self.lng_st = None
     self.lat_st = None
-    self.matrix = None
+    self.matrix = []
     self.current_pos = [None, None]
     self.prev = [None, None]
     
@@ -57,7 +58,7 @@ class MatrixPoint:
   def __call__(self, lng : float, lat : float):
     # Gọi hàm này là lấy lng, lat làm tọa độ chuẩn
     self.klat = change_to_lat(self.h)
-    self.klng = change_to_lng(lat, self.x)
+    self.klng = change_to_lng(lat, self.w)
     self.lng_st = lng
     self.lat_st = lat
     
@@ -65,6 +66,7 @@ class MatrixPoint:
     for __ in range(self.row_matrix):
       self.matrix.append([MatrixPoint.NOT_VISITED] * self.col_matrix)
     self.current_pos = [0, 0]
+    self.prev = [0, 0]
   
   def check_outpoint(self, lng, lat):
     """Kiểm tra điểm đã rời khỏi ô hiện tại chưa
@@ -126,8 +128,6 @@ class MatrixPoint:
     return (lng - self.lng_st) / self.klng, (lat - self.lat_st) / self.klat
   
   def __gps(self):
-    is_started = False
-    
     while True:
       pynmea2.NMEAStreamReader()
       newdata = self.gps.readline()
@@ -137,8 +137,8 @@ class MatrixPoint:
         lat = newmsg.latitude
         lng = newmsg.longitude
 
-        if not is_started:
-          is_started = True
+        if not MatrixPoint.is_started:
+          MatrixPoint.is_started = True
           self.__call__(lng, lat)
           
         state, i, j = self.check_outpoint(lng, lat)

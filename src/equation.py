@@ -31,9 +31,11 @@ def angle_between_two_linears(a, b):
   Returns:
     _type_: _description_
   """
+  if b[0] == 0 and b[1] == 0:
+    return 0
   na = np.array([a[0], a[1]])
   nb = np.array([b[0], b[1]])
-  cos_phi = math.abs((na * nb).sum()) / (math.sqrt((na ** 2).sum()) * math.sqrt((nb ** 2).sum()))
+  cos_phi = abs((na * nb).sum()) / (math.sqrt((na ** 2).sum()) * math.sqrt((nb ** 2).sum()))
   cos_phi = math.acos(cos_phi)
   cos_phi = math.degrees(cos_phi)
   return math.floor(cos_phi)

@@ -13,4 +13,5 @@ def control(ser : serial.Serial, motors : int, deg : int, left_right : bool):
   if left_right:
     deg = - deg
   n = str(motors) + ';' + str(motors) + ';' + str(deg) + ';#'
+  print (n)
   ser.write(bytes(n, "utf-8"))
