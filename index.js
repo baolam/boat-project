@@ -12,7 +12,7 @@ const device = io.of("/device");
 const android = io.of("/android");
 const ai = io.of("/ai");
 
-android.on("connection", (socket) => {
+io.on("connection", (socket) => {
   console.log("Co ket noi");
   socket.on("evt", (res) => {
     device.emit("evt", res);
