@@ -28,6 +28,7 @@ android.on("connection", (socket) => {
 
 device.on("connection", (socket) => {
   socket.on("record", (data) => {
+    console.log(data);
     android.emit("record", data);
   });
 });
