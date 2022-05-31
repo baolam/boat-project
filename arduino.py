@@ -2,8 +2,8 @@ import serial
 import time
 
 arduino = serial.Serial(
-  # port = "/dev/ttyACM0",
-  port = "COM6",
+  port = "/dev/ttyACM1",
+ #  port = "COM6",
   baudrate=9600,
   parity=serial.PARITY_NONE,
   stopbits=serial.STOPBITS_ONE,

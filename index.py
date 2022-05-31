@@ -4,6 +4,7 @@ import socketio
 import serial
 import threading
 import math
+import time
 
 from src import Read, MatrixPoint
 from src import request_to_server
@@ -18,7 +19,7 @@ HEIGHT = 416
 NAMESPACE = "/device"
 
 arduino = serial.Serial(
-  port = "/dev/ttyACM0",
+  port = "/dev/ttyACM1",
   # port = "COM6",
   baudrate=9600,
   parity=serial.PARITY_NONE,
@@ -28,7 +29,7 @@ arduino = serial.Serial(
 )
 
 gps = serial.Serial(
-  port = "/dev/ttyACM2",
+  port = "/dev/ttyACM0",
   # port = "COM12",
   baudrate=9600,
   timeout=0.5  
@@ -39,10 +40,13 @@ call_priority = False
 
 video = cv2.VideoCapture(0)
 infor = Read(socket, arduino, NAMESPACE)
-matrixpoint = MatrixPoint(gps, arduino)
+matrixpoint = MatrixPoint(socket, NAMESPACE, gps, arduino)
 
 def speed(sp):
+  print(sp)
+  #sp = sp["speed"]
   matrixpoint.motor = sp
+  infor.motor = sp
 
 def is_full():
   matrixpoint.is_full = 0
@@ -90,7 +94,7 @@ def classify(resp):
     
 def run_socket():
   socket.on("speed", handler=speed, namespace=NAMESPACE)
-  socket.on("classify", handler=classify, namespace=NAMESPACE)
+  socket.on("res_rec", handler=classify, namespace=NAMESPACE)
   socket.on("journey", handler=journey, namespace=NAMESPACE)
   socket.on("direction", handler=control, namespace=NAMESPACE)
   socket.connect(SERVER, namespaces=NAMESPACE)
@@ -101,7 +105,7 @@ c = 0
 while True:
   __, frame = video.read()
   c += 1
-  if c % 3 == 0:
+  if c % 100 == 0:
     c = 0
     request_to_server(frame, SERVER)
   if matrixpoint.is_trace == 0 and MatrixPoint.is_started:
@@ -117,8 +121,10 @@ while True:
           threading.Thread(name="tracing", target=matrixpoint.trace, args=(trace,), daemon=True).start()
       else:
         st, trace = bfs_get_x_nearest(matrixpoint.matrix, MatrixPoint.NOT_VISITED, i, j)
+        print(trace)
         if st:
           threading.Thread(name="tracing", target=matrixpoint.trace, args=(trace,), daemon=True).start()
         else:
           st, trace = goes_to_home(matrixpoint.matrix, i, j)
           threading.Thread(name="tracing", target=matrixpoint.trace, args=(trace,), daemon=True).start()
+  #time.sleep(0.1)

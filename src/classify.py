@@ -14,7 +14,7 @@ def request_to_server(img, url : str) -> int:
   """
   cv2.imwrite("temp.png", img)
   with open("temp.png", mode="rb") as fin:
-    b = base64.encodestring(fin.read())
+    b = str(base64.b64encode(fin.read()))
   b = b[2:len(b) - 1]
   r = requests.get(url, json = { "base64" : b })
   return r.status_code

@@ -6,10 +6,12 @@ import serial
 import threading
 import pynmea2
 import time
+from .Read import Read
 from .lnglat import change_to_lat, change_to_lng, latlng
 from .sensor_hn import read
 from .equation import create_linear_equation, angle_between_two_linears
 from .control import control
+import socketio
 
 def check_point_ctd(ti, tj, row_matrix, col_matrix):
   return ti >= 0 and ti <= row_matrix - 1 \
@@ -25,10 +27,12 @@ class MatrixPoint:
   NOT_VISITED = 0 # Mã chưa duyệt
   PRIORITY = 2 # Mã ưu tiên tới
     
-  def __init__(self, gps : serial.Serial, arduino : serial.Serial, w = 1, h = 1, wb = 100, hb = 100):
+  def __init__(self, socket : socketio.Client, namespace : str, gps : serial.Serial, arduino : serial.Serial, w = 1, h = 1, wb = 100, hb = 100):
     assert wb % w == 0
     assert hb % h == 0
     
+    self.socket = socket
+    self.namespace = namespace
     # Giả định w ứng với x
     # Giả định h ứng với y
     self.row_matrix = int(wb / w)
@@ -101,7 +105,7 @@ class MatrixPoint:
     self.is_trace = 1
     
     while len(trace) > 0:
-      if self.is_trace == 1 and MatrixPoint.is_started:
+      if self.is_trace == 1 and MatrixPoint.is_started and Read.is_started:
         target = trace.pop(0)
         current_target = create_linear_equation(self.current_pos, target)
         prev_current = create_linear_equation(self.prev, self.current_pos)
@@ -130,15 +134,29 @@ class MatrixPoint:
     return (lng - self.lng_st) / self.klng, (lat - self.lat_st) / self.klat
   
   def __gps(self):
+    count_gps = 0
     while True:
       pynmea2.NMEAStreamReader()
       newdata = self.gps.readline()
       newdata = newdata.decode("utf-8")
       if newdata[0:6] == "$GPRMC":
-        newmsg = pynmea2.parse(newdata)
-        lat = newmsg.latitude
-        lng = newmsg.longitude
-
+        try:
+          newmsg = pynmea2.parse(newdata)
+          lat = newmsg.latitude
+          lng = newmsg.longitude
+          count_gps += 1
+        except:
+          pass
+        if count_gps >= 5 and lat!=0 and lng !=0:
+          pos = {
+              "lat": lat,
+              "lng": lng
+          }
+          print(pos)
+          if self.socket.connected:
+            self.socket.emit("gps", data=pos, namespace=self.namespace)
+          count_gps = 0
+          
         if not MatrixPoint.is_started:
           MatrixPoint.is_started = True
           self.__call__(lng, lat)
