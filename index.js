@@ -21,7 +21,7 @@ android.on("connection", (socket) => {
   });
 
   socket.on("speed", (res) => {
-    device.emit("speed", res);
+    device.emit("speed", res.speed);
   });
 
   socket.on("direction", (res) => {
