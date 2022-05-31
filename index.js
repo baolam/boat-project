@@ -4,7 +4,9 @@ const http = require("http");
 
 const app = express();
 const server = http.createServer(app);
-const io = new socketio.Server(server);
+const io = new socketio.Server(server, {
+  allowEIO3 : true
+});
 
 const PORT = process.env.PORT || 3000;
 
