@@ -34,6 +34,10 @@ device.on("connection", (socket) => {
     console.log(data);
     android.emit("record", data);
   });
+
+  socket.on("gps", (data) => {
+    android.emit("gps", data);
+  });
 });
 
 ai.on("connection", (socket) => {
