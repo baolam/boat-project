@@ -21,7 +21,8 @@ android.on("connection", (socket) => {
   });
 
   socket.on("speed", (res) => {
-    console.log(res);
+    res = JSON.parse(res);
+    console.log(res.speed);
     device.emit("speed", res.speed);
   });
 
