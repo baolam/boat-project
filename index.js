@@ -21,6 +21,7 @@ android.on("connection", (socket) => {
   });
 
   socket.on("speed", (res) => {
+    console.log(res);
     device.emit("speed", res.speed);
   });
 
