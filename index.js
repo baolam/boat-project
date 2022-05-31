@@ -36,6 +36,7 @@ device.on("connection", (socket) => {
   });
 
   socket.on("gps", (data) => {
+    console.log(data);
     android.emit("gps", data);
   });
 });
