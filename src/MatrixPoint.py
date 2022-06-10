@@ -147,16 +147,7 @@ class MatrixPoint:
           count_gps += 1
         except:
           pass
-        if count_gps >= 5 and lat!=0 and lng !=0:
-          pos = {
-              "lat": lat,
-              "lng": lng
-          }
-          print(pos)
-          if self.socket.connected:
-            self.socket.emit("gps", data=pos, namespace=self.namespace)
-          count_gps = 0
-          
+        
         if not MatrixPoint.is_started:
           MatrixPoint.is_started = True
           self.__call__(lng, lat)
@@ -170,3 +161,15 @@ class MatrixPoint:
           self.matrix[self.current_pos[0]][self.current_pos[1]] = MatrixPoint.VISITED
           self.flood()
           self.is_trace = 1
+        
+        if count_gps >= 5 and lat!=0 and lng !=0:
+          pos = {
+            "lat": lat,
+            "lng": lng,
+            "i" : i,
+            "j" : j
+          }
+          if self.socket.connected:
+            self.socket.emit("gps", data=pos, namespace=self.namespace)
+          count_gps = 0
+          

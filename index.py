@@ -52,6 +52,7 @@ def is_full():
   matrixpoint.is_full = 0
 
 def journey(infor):
+  global NAMESPACE
   """Tạo hành trình sẵn cho thuyền. Công việc này được thực hiện đầu tiên, trước khi thực hiện việc khác, không sẽ bị lỗi
 
   Args:
@@ -64,18 +65,19 @@ def journey(infor):
     matrixpoint.row_matrix = int(wb / matrixpoint.w)
     matrixpoint.col_matrix = int(hb / matrixpoint.h)
     matrixpoint(matrixpoint.lng_st, matrixpoint.lat_st)
+  else:
+    socket.emit("cannot_update_journey", namespace=NAMESPACE)
 
-def control(left):
+def _control(left):
   i, j = matrixpoint.current_pos
   if left and i >= 1 and matrixpoint.matrix[i-1][j] != MatrixPoint.WARNING_VC:
-    control(arduino, 0, left)
+    control(arduino, matrixpoint.motor ,0, left)
   if not left and i <= matrixpoint.row_matrix - 1 \
     and matrixpoint.matrix[i-1][j] != MatrixPoint.WARNING_VC:
-    control(arduino, 0, left)
+    control(arduino, matrixpoint.motor ,0, left)
   
 def classify(resp):
   global call_priority
-  print (resp)
   
   matrixpoint.is_full += len(resp)
   if len(resp) != 0:
@@ -96,7 +98,7 @@ def run_socket():
   socket.on("speed", handler=speed, namespace=NAMESPACE)
   socket.on("res_rec", handler=classify, namespace=NAMESPACE)
   socket.on("journey", handler=journey, namespace=NAMESPACE)
-  socket.on("direction", handler=control, namespace=NAMESPACE)
+  socket.on("direction", handler=_control, namespace=NAMESPACE)
   socket.connect(SERVER, namespaces=NAMESPACE)
 
 threading.Thread(name="socket", target=run_socket, daemon=True).start()
