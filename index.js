@@ -69,16 +69,3 @@ app.get("/control", (req, res) => {
 server.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
 });
-
-// setInterval(() => {
-//   android.emit("gps", {
-//     lat : Math.random() * 12,
-//     lng : Math.random() * 16,
-//     i : Math.random() * 100,
-//     j : Math.random() * 100
-//   });
-//   android.emit("record", {
-//     turbidity : Math.random() * 500,
-//     dissolved_solid : Math.random() * 1023 * 3
-//   });
-// }, 5000);
