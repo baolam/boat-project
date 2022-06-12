@@ -93,12 +93,17 @@ def classify(resp):
       # Cập nhập theo trường hợp này
       i, j = math.floor(th2[0]), math.floor(th2[1])
     matrixpoint.matrix[i][j] = MatrixPoint.PRIORITY
-    
+
+def _go_to_home():
+  st, trace = goes_to_home(matrixpoint.matrix, i, j)
+  threading.Thread(name="tracing", target=matrixpoint.trace, args=(trace,), daemon=True).start()      
+  
 def run_socket():
   socket.on("speed", handler=speed, namespace=NAMESPACE)
   socket.on("res_rec", handler=classify, namespace=NAMESPACE)
   socket.on("journey", handler=journey, namespace=NAMESPACE)
   socket.on("direction", handler=_control, namespace=NAMESPACE)
+  socket.emit("stop", handler=_go_to_home, namespace=NAMESPACE)
   socket.connect(SERVER, namespaces=NAMESPACE)
 
 threading.Thread(name="socket", target=run_socket, daemon=True).start()
