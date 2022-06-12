@@ -1,6 +1,7 @@
 const socketio = require("socket.io");
 const express = require("express");
 const http = require("http");
+const path = require("path");
 
 const app = express();
 const server = http.createServer(app);
@@ -15,7 +16,6 @@ const android = io.of("/android");
 const ai = io.of("/ai");
 
 android.on("connection", (socket) => {
-  console.log("Co ket noi");
   socket.on("evt", (res) => {
     device.emit("evt", res);
   });
@@ -28,18 +28,24 @@ android.on("connection", (socket) => {
   socket.on("direction", (res) => {
     device.emit("direction", res == 't' ? true : false);
   });
+
+  socket.on("stop", () => {
+    device.emit("stop");
+  });
 });
 
 device.on("connection", (socket) => {
   socket.on("record", (data) => {
-    console.log(data);
     android.emit("record", data);
   });
 
   socket.on("gps", (data) => {
-    console.log(data);
     android.emit("gps", data);
   });
+
+  socket.on("is_full", () => {
+    android.emit("is_full");
+  })
 });
 
 ai.on("connection", (socket) => {
@@ -50,11 +56,29 @@ ai.on("connection", (socket) => {
 
 app.use(express.urlencoded({ extended : false, limit : "5mb" }));
 app.use(express.json({ limit : "5mb" }));
+app.use(express.static(path.join(__dirname, "public")));
 app.get("/", (req, res) => {
   ai.emit("handle", req.body.base64);
   res.status(200).send("OK");
 });
 
+app.get("/control", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "layout", "index.html"));
+});
+
 server.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
 });
+
+// setInterval(() => {
+//   android.emit("gps", {
+//     lat : Math.random() * 12,
+//     lng : Math.random() * 16,
+//     i : Math.random() * 100,
+//     j : Math.random() * 100
+//   });
+//   android.emit("record", {
+//     turbidity : Math.random() * 500,
+//     dissolved_solid : Math.random() * 1023 * 3
+//   });
+// }, 5000);

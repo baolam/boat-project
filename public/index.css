@@ -1,0 +1,47 @@
+.color-param {
+  color: yellowgreen;
+}
+
+.main-param, #list-notification {
+  font-size: 24px;
+  margin-left: 5px;
+}
+
+.notification-param {
+  height: 175px;
+}
+
+.chart {
+  height: 30%;
+}
+
+.journey {
+  height: 70%;
+}
+
+h2 {
+  color: red;
+}
+
+h3 {
+  color: blue;
+}
+
+h5 {
+  color: green;
+}
+
+canvas {
+  border: 1px solid black;
+  height: 87%;
+  width: 100%;
+}
+
+.title_journey {
+  height: 10%;
+}
+
+.pd {
+  margin-left: 5px;
+  margin-right: 5px;
+}

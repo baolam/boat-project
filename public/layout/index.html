@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Điều khiển thuyền hốt rác</title>
+  <link href="../bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+  <link rel="stylesheet" href="../index.css" />
+  <link rel="stylesheet" href="../seekbar.css" />
+</head>
+<body>
+  <div class="container-fluid">
+    <h2 class="text-center">Điều khiển và thông tin của thuyền</h2>
+    <div class="row">
+      <div class="col-3">
+        <!-- Thông số -->
+        <div class="notification-param">
+          <h5 class="text-center">Thông báo</h5>
+          <ul id="list-notification"></ul>
+        </div>
+        <div class="main-param">
+          <h5 class="text-center">GPS</h5>
+          <div id="lat-param">Vĩ độ : NULL</div>
+          <div id="lng-param">Kinh độ : NULL</div>
+          <h5 class="text-center">Tốc độ</h5>
+          <div class="motor-speed">
+            <div id="param">Tốc độ : 0</div>
+            <div class="seekbar-container">
+              <input id="input-motor-speed" min="0" max="100" value="0" type="range" class="seekbar" />
+            </div>
+          </div>
+          <h5 class="text-center">Hành trình</h5>
+          <div id="width-journey">Chiều dài ht : NULL</div>
+          <div id="height-journey">Chiều rộng ht : NULL</div>
+        </div>
+      </div>
+      <div class="col-9">
+        <!-- Biểu đồ ... -->
+        <div class="row chart">
+          <div id="ntu-tds-container"></div>
+        </div>
+        <div class="journey">
+          <h5 class="text-center title_journey">Hành trình đi được</h5>
+          <canvas id="journey-drawing"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="control">
+      <h3 class="text-center">Điều khiển</h3>
+      <div class="row">
+        <button class="col btn btn-primary pd" id="go-to-home">Về nhà</button>
+        <button class="col btn btn-primary pd" id="left">Rẽ trái</button>
+        <button class="col btn btn-primary pd" id="stop">Dừng lại</button>
+        <button class="col btn btn-primary pd" id="right">Rẽ phải</button>
+      </div>
+    </div>
+  </div>
+  <script src="../socket.io/socket.io.js"></script>
+  <script src="../highcharts.js"></script>
+  <script src="../exporting.js"></script>
+  <script src="../bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+  <script src="../canvas.js"></script>
+  <script src="../index.js"></script>
+</body>
+</html>
