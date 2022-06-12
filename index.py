@@ -70,10 +70,10 @@ def journey(infor):
 
 def _control(left):
   i, j = matrixpoint.current_pos
-  if left and i >= 1 and matrixpoint.matrix[i-1][j] != MatrixPoint.WARNING_VC:
+  if left and j >= 1 and matrixpoint.matrix[i][j - 1] != MatrixPoint.WARNING_VC:
     control(arduino, matrixpoint.motor ,0, left)
   if not left and i <= matrixpoint.row_matrix - 1 \
-    and matrixpoint.matrix[i-1][j] != MatrixPoint.WARNING_VC:
+    and matrixpoint.matrix[i + 1][j] != MatrixPoint.WARNING_VC:
     control(arduino, matrixpoint.motor ,0, left)
   
 def classify(resp):
@@ -116,6 +116,7 @@ while True:
     if matrixpoint.meet >= matrixpoint.is_full:
       st, trace = goes_to_home(matrixpoint.matrix, i, j)
       threading.Thread(name="tracing", target=matrixpoint.trace, args=(trace,), daemon=True).start()      
+      socket.emit("is_full", namespace=NAMESPACE)
     else:
       if call_priority:  
         st, trace = bfs_get_x_nearest(matrixpoint.matrix, MatrixPoint.PRIORITY, i, j)
