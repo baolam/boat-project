@@ -2,10 +2,11 @@ from typing import Tuple
 import math
 
 earth_radius = 3960.0
+miles_to_meter = 1609.344
 radians_to_degrees = 180 / math.pi
 degress_to_radians = math.pi / 180
 
-def change_to_lat(miles):
+def change_to_lat(metters):
   """Đổi mét sang độ dài lat
 
   Args:
@@ -14,9 +15,9 @@ def change_to_lat(miles):
   Returns:
     _type_: _description_
   """
-  return (miles * earth_radius) / radians_to_degrees
+  return (metters / miles_to_meter * earth_radius) / radians_to_degrees
 
-def change_to_lng(lat, miles):
+def change_to_lng(lat, metters):
   """Đổi mét sang độ dài lat
 
   Args:
@@ -27,7 +28,7 @@ def change_to_lng(lat, miles):
     _type_: _description_
   """
   r = earth_radius * math.cos(lat * degress_to_radians)
-  return (miles / r) * radians_to_degrees
+  return ((metters / miles_to_meter) / r) * radians_to_degrees
 
 def latlng(lng, lat) -> Tuple:
   """Kinh độ vĩ độ dưới dạng tuple

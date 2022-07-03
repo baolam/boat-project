@@ -113,6 +113,12 @@ class MatrixPoint:
         deg = angle_between_two_linears(current_target, prev_current)
         left_right = current_target[2] >= prev_current[2]
         
+        # Gửi thông báo lên server
+        self.socket.emit("notification", {
+          "deg" : deg,
+          "left" : left_right
+        })       
+        
         control(self.arduino, 0, deg, left_right)
         time.sleep(5.)
         control(self.arduino, self.motor, 0, False)
@@ -139,20 +145,20 @@ class MatrixPoint:
       pynmea2.NMEAStreamReader()
       newdata = self.gps.readline()
       newdata = newdata.decode("utf-8")
+      
       if newdata[0:6] == "$GPRMC":
-        try:
-          newmsg = pynmea2.parse(newdata)
-          lat = newmsg.latitude
-          lng = newmsg.longitude
-          count_gps += 1
-        except:
-          pass
-        
+        newmsg = pynmea2.parse(newdata)
+        lat = newmsg.latitude
+        lng = newmsg.longitude
+        count_gps += 1
+
         if not MatrixPoint.is_started:
+          print ("Standard ", lng, lat)
           MatrixPoint.is_started = True
           self.__call__(lng, lat)
           
         state, i, j = self.check_outpoint(lng, lat)
+        print (i, j, lng, lat)
         if state:
           # Cập nhật lại tọa độ mới
           self.prev = self.current_pos
@@ -162,7 +168,7 @@ class MatrixPoint:
           self.flood()
           self.is_trace = 1
         
-        if count_gps >= 5 and lat!=0 and lng !=0:
+        if count_gps >= 2 and lat!=0 and lng !=0:
           pos = {
             "lat": lat,
             "lng": lng,
