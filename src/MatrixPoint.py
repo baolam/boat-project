@@ -43,7 +43,7 @@ class MatrixPoint:
     self.h = h
     self.meet = 0 # Biến lưu tổng số lần nhận dạng rác
     self.is_full = 2500
-    self.is_run_socket = False
+    self.is_run_socket = True
     
     self.klng = None
     self.klat = None

@@ -40,7 +40,6 @@ call_priority = False
 
 video = cv2.VideoCapture(0)
 infor = Read(socket, arduino, NAMESPACE)
-matrixpoint = MatrixPoint(socket, NAMESPACE, gps, arduino)
 
 def speed(sp):
   print(sp)
@@ -108,6 +107,11 @@ def run_socket():
 
 threading.Thread(name="socket", target=run_socket, daemon=True).start()
 c = 0
+
+print ("Chương trình chính bắt đầu sau 5s")
+time.sleep(5)
+matrixpoint = MatrixPoint(socket, NAMESPACE, gps, arduino)
+print ("Chương trình đã chạy")
 
 while True:
   __, frame = video.read()
