@@ -67,13 +67,15 @@ socket.on("notification", (notify) => {
       l.innerHTML = `Rẽ trái góc ${Math.floor(deg)} độ`;
     else 
       l.innerHTML = `Rẽ phải góc ${Math.floor(deg)} độ`;
+    
+    list_notification.appendChild(l);
   }
 });
 
-// Sau 5s refresh 1 lần
+// Sau 4.5s refresh 1 lần
 setInterval(() => {
   list_notification.innerHTML = "";
-}, 5000);
+}, 4500);
 
 input_param.addEventListener("change", (ev) => {
   input_param.value = ev.target.value;
