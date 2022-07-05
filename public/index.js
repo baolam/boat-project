@@ -43,8 +43,25 @@ socket.on("is_full", () => {
   list_notification.innerHTML = '<li>Rác đã đầy</li>';
 });
 
+let temp = true;
 socket.on("notification", (notify) => {
-  console.log(notify);
+  if (notify.standard !== undefined) {
+    let l = document.createElement('li');
+    l.innerHTML = "Chưa đọc được GPS";
+
+    if (notify.standard && temp) {
+      list_notification.innerHTML = "";
+      list_notification.appendChild(l);
+
+      temp = false;
+    } else if (! temp) {
+      list_notification.innerHTML = "";
+      l.innerHTML = "Đọc GPS thành công";
+      list_notification.appendChild(l);
+
+      temp = true;
+    }
+  }
 });
 
 input_param.addEventListener("change", (ev) => {
