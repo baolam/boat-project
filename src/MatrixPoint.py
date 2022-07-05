@@ -164,7 +164,7 @@ class MatrixPoint:
         count_gps += 1
 
         if lat != 0.0 and lng != 0.0:
-          if self.is_run_socket:
+          if self.is_run_socket and (not MatrixPoint.is_started):
             self.socket.emit("notification", {
               "standard" : True
             }, namespace=self.namespace)
@@ -177,7 +177,8 @@ class MatrixPoint:
             self.socket.emit("notification", {
               "standard" : False
             }, namespace=self.namespace)
-
+          MatrixPoint.is_started = False
+          
         if MatrixPoint.is_started:
           state, i, j = self.check_outpoint(lng, lat)
           

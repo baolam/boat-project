@@ -7,6 +7,7 @@ import math
 import time
 
 from src import Read, MatrixPoint
+from src import read
 from src import request_to_server
 from src import bfs_get_x_nearest, goes_to_home
 from src import depthmeasurement
@@ -133,7 +134,9 @@ while True:
   # Chế độ điều khiển bằng tay
   if not matrixpoint.is_started and c_hand % 20 == 0:
     # Mặc định cho thuyền chạy thẳng
-    control(arduino, matrixpoint.motor, 0, True)
+    r = read()
+    if r[2] == 0:
+      control(arduino, matrixpoint.motor, 0, True)
     
     socket.emit("notification", {
       "deg" : 0,
