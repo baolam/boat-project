@@ -70,10 +70,10 @@ socket.on("notification", (notify) => {
   }
 });
 
-// Sau 8s refresh 1 lần
+// Sau 5s refresh 1 lần
 setInterval(() => {
   list_notification.innerHTML = "";
-}, 8000);
+}, 5000);
 
 input_param.addEventListener("change", (ev) => {
   input_param.value = ev.target.value;
