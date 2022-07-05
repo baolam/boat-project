@@ -63,17 +63,17 @@ socket.on("notification", (notify) => {
     let left = notify.left_right;
     let deg = notify.deg;
     
-    if (left)
+    if (! left)
       l.innerHTML = `Rẽ trái góc ${Math.floor(deg)} độ`;
     else 
       l.innerHTML = `Rẽ phải góc ${Math.floor(deg)} độ`;
   }
 });
 
-// Sau 15s refresh 1 lần
+// Sau 8s refresh 1 lần
 setInterval(() => {
   list_notification.innerHTML = "";
-}, 15000);
+}, 8000);
 
 input_param.addEventListener("change", (ev) => {
   input_param.value = ev.target.value;
@@ -94,11 +94,11 @@ go_to_home.addEventListener("click", () => {
 });
 
 left.addEventListener("click", () => {
-  socket.emit("direction", "t");
+  socket.emit("direction", "f");
 });
 
 right.addEventListener("click", () => {
-  socket.emit("direction", "f");
+  socket.emit("direction", "t");
 });
 
 stop_.addEventListener("click", () => {
