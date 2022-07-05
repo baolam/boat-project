@@ -69,14 +69,20 @@ def journey(infor):
 
 def _control(left):
   i, j = matrixpoint.current_pos
+  t = {
+    "deg" : 45,
+    "left_right" : left
+  }
   try:
     if left and j >= 1 and matrixpoint.matrix[i][j - 1] != MatrixPoint.WARNING_VC:
-      control(arduino, matrixpoint.motor ,0, left)
+      control(arduino, matrixpoint.motor, 45, left)
     if not left and i <= matrixpoint.row_matrix - 1 \
     and matrixpoint.matrix[i + 1][j] != MatrixPoint.WARNING_VC:
-      control(arduino, matrixpoint.motor ,0, left)
+      control(arduino, matrixpoint.motor, 45, left)
+    socket.emit("notification", t, namespace=NAMESPACE)
   except:
-    control(arduino, matrixpoint.motor, 0, left)
+    control(arduino, matrixpoint.motor, 45, left)
+    socket.emit("notification", t, namespace=NAMESPACE)
     
 def classify(resp):
   global call_priority

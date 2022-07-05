@@ -63,18 +63,19 @@ class MatrixPoint:
     
   def __call__(self, lng : float, lat : float):
     # Gọi hàm này là lấy lng, lat làm tọa độ chuẩn
-    self.klat = change_to_lat(self.h)
-    self.klng = change_to_lng(lat, self.w)
-    self.lng_st = lng
-    self.lat_st = lat
-    
-    self.four_pos_mat = []
-    for __ in range(self.row_matrix):
-      self.matrix.append([MatrixPoint.NOT_VISITED] * self.col_matrix)
-      
-    self.matrix[0][0] = MatrixPoint.VISITED
-    self.current_pos = [0, 0]
-    self.prev = [0, 0]
+    try:
+      self.klat = change_to_lat(self.h)
+      self.klng = change_to_lng(lat, self.w)
+      self.lng_st = lng
+      self.lat_st = lat
+    finally:
+      self.four_pos_mat = []
+      for __ in range(self.row_matrix):
+        self.matrix.append([MatrixPoint.NOT_VISITED] * self.col_matrix)
+        
+      self.matrix[0][0] = MatrixPoint.VISITED
+      self.current_pos = [0, 0]
+      self.prev = [0, 0]
   
   def check_outpoint(self, lng, lat):
     """Kiểm tra điểm đã rời khỏi ô hiện tại chưa
