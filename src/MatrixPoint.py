@@ -172,7 +172,7 @@ class MatrixPoint:
           self.__call__(lng, lat)
           
         else:
-          if self.is_run_socket and MatrixPoint.is_started:          
+          if self.is_run_socket:          
             self.socket.emit("notification", {
               "standard" : False
             }, namespace=self.namespace)
