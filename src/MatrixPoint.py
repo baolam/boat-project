@@ -19,8 +19,8 @@ def check_point_ctd(ti, tj, row_matrix, col_matrix):
   return ti >= 0 and ti <= row_matrix - 1 \
   and tj >= 0 and tj <= col_matrix - 1
 
-lat_filter = KalmanFilter(0.00004, 0.00005, 0.002346)
-lng_filter = KalmanFilter(0.00004, 0.00005, 0.002346)
+i_filter = KalmanFilter(3.5, 0.5, 2)
+j_filter = KalmanFilter(3, 0.5, 2)
 
 class MatrixPoint:
   I = [0, 0, 1, -1] # Phiên mã (trái, phải, trên)
@@ -70,9 +70,6 @@ class MatrixPoint:
     try:
       self.klat = change_to_lat(self.h)
       self.klng = change_to_lng(lat, self.w)
-      
-      lat_filter.set_measurement_error(6 * self.klat)
-      lng_filter.set_measurement_error(6 * self.klng)
       
       self.lng_st = lng
       self.lat_st = lat
@@ -166,12 +163,6 @@ class MatrixPoint:
         lng = newmsg.longitude
         count_gps += 1
 
-        if lat != 0.0:
-          lat = lat_filter.update_estimate(lat)
-        
-        if lng != 0.0:
-          lng = lng_filter.update_estimate(lng)
-        
         if not MatrixPoint.is_started:
           if lat != 0.0 and lng != 0.0:
             if self.is_run_socket:
@@ -190,6 +181,15 @@ class MatrixPoint:
 
         if MatrixPoint.is_started:
           state, i, j = self.check_outpoint(lng, lat)
+          
+          # Lọc tầng 1          
+          i = i_filter.update_estimate(i)
+          j = j_filter.update_estimate(j)
+          
+          # Lọc tầng 2
+          i = i_filter.update_estimate(i)
+          j = j_filter.update_estimate(j)
+          
           if state:
             # Cập nhật lại tọa độ mới
             self.prev = self.current_pos
