@@ -50,18 +50,11 @@ socket.on("notification", (notify) => {
     let l = document.createElement('li');
     l.innerHTML = "Chưa đọc được GPS";
 
-    if (notify.standard && temp) {
-      list_notification.innerHTML = "";
-      list_notification.appendChild(l);
-
-      temp = false;
-    } else if (! temp) {
-      list_notification.innerHTML = "";
+    if (notify.standard)
       l.innerHTML = "Đọc GPS thành công";
-      list_notification.appendChild(l);
-
-      temp = true;
-    }
+    
+    list_notification.innerHTML = "";
+    list_notification.appendChild(l);
   }
 });
 
