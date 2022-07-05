@@ -124,7 +124,7 @@ class MatrixPoint:
         # Gửi thông báo lên server
         t = {
           "deg" : deg,
-          "left" : left_right
+          "left_right" : left_right
         }
         
         print ("Hành trình thực hiện ", t)
