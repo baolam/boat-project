@@ -7,6 +7,10 @@
   margin-left: 5px;
 }
 
+.item-notification {
+  font-size: 16px !important;
+}
+
 .notification-param {
   height: 175px;
 }

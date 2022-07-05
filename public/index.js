@@ -46,25 +46,34 @@ socket.on("is_full", () => {
 let temp = true;
 socket.on("notification", (notify) => {
   let l = document.createElement('li');
+  l.className = "item-notification";
+
   if (notify.standard != undefined) {
     l.innerHTML = "Chưa đọc được GPS";
 
     if (notify.standard)
       l.innerHTML = "Đọc GPS thành công";
     
-    list_notification.innerHTML = "";
+    list_notification.appendChild(l);
+  } else if (notify.can !== undefined) {
+    l.innerHTML = notify.can;
+    
     list_notification.appendChild(l);
   } else {
     let left = notify.left_right;
     let deg = notify.deg;
     
-    list_notification.innerHTML = "";
     if (left)
       l.innerHTML = `Rẽ trái góc ${Math.floor(deg)} độ`;
     else 
       l.innerHTML = `Rẽ phải góc ${Math.floor(deg)} độ`;
   }
 });
+
+// Sau 15s refresh 1 lần
+setInterval(() => {
+  list_notification.innerHTML = "";
+}, 15000);
 
 input_param.addEventListener("change", (ev) => {
   input_param.value = ev.target.value;
