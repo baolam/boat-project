@@ -45,7 +45,8 @@ socket.on("is_full", () => {
 
 let temp = true;
 socket.on("notification", (notify) => {
-  if (notify.standard !== undefined) {
+  console.log(notify);
+  if (notify.standard != undefined) {
     let l = document.createElement('li');
     l.innerHTML = "Chưa đọc được GPS";
 
