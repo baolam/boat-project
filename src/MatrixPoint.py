@@ -19,8 +19,8 @@ def check_point_ctd(ti, tj, row_matrix, col_matrix):
   return ti >= 0 and ti <= row_matrix - 1 \
   and tj >= 0 and tj <= col_matrix - 1
 
-i_filter = KalmanFilter(3.5, 0.5, 2)
-j_filter = KalmanFilter(3, 0.5, 2)
+i_filter = KalmanFilter(1.5, 0.5, 2)
+j_filter = KalmanFilter(2, 0.5, 2)
 
 class MatrixPoint:
   I = [0, 0, 1, -1] # Phiên mã (trái, phải, trên)
