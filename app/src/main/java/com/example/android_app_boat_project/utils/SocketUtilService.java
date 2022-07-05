@@ -7,14 +7,16 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.IO;
-import com.github.nkzawa.socketio.client.Socket;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URI;
 import java.net.URISyntaxException;
+
+import io.socket.client.IO;
+import io.socket.client.Manager;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -27,6 +29,7 @@ import java.net.URISyntaxException;
 public class SocketUtilService extends IntentService {
     public static final String ACTION_NEW_RECORD = "com.example.android_app_boat_project.utils.action.ACTION_NEW_RECORD";
     public static final String ACTION_INIT_SERVICE = "com.example.android_app_boat_project.utils.action.ACTION_INIT_SERVICE";
+    public static final String ACTION_GET_LAT_LNG = "com.example.android_app_boat_project.utils.action.ACTION_GET_LAT_LNG";
 
     public static final String DATABASE_SENSOR_NAME = "sensor.sqlite";
     public static final String TABLE_SENSOR_NAME = "SensorRecord";
@@ -66,8 +69,29 @@ public class SocketUtilService extends IntentService {
     }
 
     private void intialize(String server_address, Context context) throws URISyntaxException {
-        mSocket = IO.socket(server_address);
+        mSocket = IO.socket(URI.create(server_address + "/android"));
+
+        mSocket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Log.d("SOCKET", String.valueOf(mSocket.connected()));
+            }
+        });
+
+
+        mSocket.on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                for (Object arg : args) {
+                    Log.d("SOCKET", arg.toString());
+                }
+            }
+        });
+
         mSocket.on("record", onGetRecord);
+        mSocket.on("gps", onGetGPS);
+
+        mSocket.connect();
 
         sensor_database = new DatabaseUtils(context, DATABASE_SENSOR_NAME, null, 1);
         sensor_database.QueryNotReturnData("CREATE TABLE IF NOT EXISTS SensorRecord(" +
@@ -78,12 +102,16 @@ public class SocketUtilService extends IntentService {
         @Override
         public void call(Object... args) {
             JSONObject rec = (JSONObject) args[0];
+            //Log.d("GET_DATA", rec.toString());
             try {
                 String time = rec.getString(PARAM_TIME_RECORD);
                 Double turbidity = rec.getDouble(PARAM_TURBIDITY_RECORD);
                 Double dissolved_solid = rec.getDouble(PARAM_DISSOLVED_SOLID_RECORD);
                 Double speed = rec.getDouble(PARAM_SPEED_RECORD);
                 Double battery = rec.getDouble(PARAM_BATTERY_RECORD);
+                int motor_speed = rec.getInt(PARAM_MOTOR_SPEED_RECORD);
+
+                Log.d("motor_speed", String.valueOf(motor_speed) + '%');
 
                 // Send data to activity
                 Intent boardcast_data = new Intent();
@@ -94,12 +122,32 @@ public class SocketUtilService extends IntentService {
                 boardcast_data.putExtra(PARAM_DISSOLVED_SOLID_RECORD, dissolved_solid);
                 boardcast_data.putExtra(PARAM_SPEED_RECORD, speed);
                 boardcast_data.putExtra(PARAM_BATTERY_RECORD, battery);
+                boardcast_data.putExtra(PARAM_MOTOR_SPEED_RECORD, motor_speed);
 
                 sendBroadcast(boardcast_data);
 
                 // Write database (Overwrite --> Need fixing)
-                sensor_database.QueryNotReturnData("INSERT INTO " + TABLE_SENSOR_NAME + " VALUES(" +
-                        time + "," + turbidity.toString() + "," + dissolved_solid.toString() + "," + speed.toString() + "," + battery.toString() + ")");
+//                sensor_database.QueryNotReturnData("INSERT INTO " + TABLE_SENSOR_NAME + " VALUES(" +
+//                        time + "," + turbidity.toString() + "," + dissolved_solid.toString() + "," + speed.toString() + "," + battery.toString() + ")");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+    private Emitter.Listener onGetGPS = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            JSONObject rec = (JSONObject) args[0];
+
+            try {
+                Intent boardcast_data = new Intent();
+
+                boardcast_data.setAction(ACTION_GET_LAT_LNG);
+                boardcast_data.putExtra("lat", rec.getDouble("lat"));
+                boardcast_data.putExtra("lng", rec.getDouble("lng"));
+
+                sendBroadcast(boardcast_data);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
