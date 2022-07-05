@@ -43,7 +43,6 @@ video = cv2.VideoCapture(0)
 infor = Read(socket, arduino, NAMESPACE)
 
 def speed(sp):
-  print(sp)
   #sp = sp["speed"]
   matrixpoint.motor = sp
   infor.motor = sp
@@ -118,7 +117,15 @@ def _go_to_home():
   if matrixpoint.is_started:
     st, trace = goes_to_home(matrixpoint.matrix, matrixpoint.current_pos[0], matrixpoint.current_pos[1])
     threading.Thread(name="tracing", target=matrixpoint.trace, args=(trace,), daemon=True).start()      
-  
+
+    socket.emit("notification", {
+      "can" : "Đi về nhà"
+    }, namespace=NAMESPACE)
+  else:
+    socket.emit("notification", {
+      "can" : "Không thể đi về nhà"
+    }, namespace=NAMESPACE)
+    
   
 def run_socket():
   socket.on("speed", handler=speed, namespace=NAMESPACE)
@@ -152,10 +159,10 @@ while True:
     if r[2] == 0:
       control(arduino, matrixpoint.motor, 0, True)
     
-    socket.emit("notification", {
-      "deg" : 0,
-      "left_right" : True
-    }, namespace=NAMESPACE)
+      socket.emit("notification", {
+        "deg" : 0,
+        "left_right" : True
+      }, namespace=NAMESPACE)
     
     c_hand = -1
   
@@ -165,7 +172,9 @@ while True:
     if matrixpoint.meet >= matrixpoint.is_full:
       st, trace = goes_to_home(matrixpoint.matrix, i, j)
       threading.Thread(name="tracing", target=matrixpoint.trace, args=(trace,), daemon=True).start()      
-      socket.emit("is_full", namespace=NAMESPACE)
+      socket.emit("notification", {
+        "can" : "Rác đã đầy"
+      }, namespace=NAMESPACE)
     else:
       if call_priority:  
         st, trace = bfs_get_x_nearest(matrixpoint.matrix, MatrixPoint.PRIORITY, i, j)
