@@ -141,7 +141,7 @@ while True:
     socket.emit("notification", {
       "deg" : 0,
       "left_right" : True
-    })
+    }, namespace=NAMESPACE)
     
     c_hand += 1
   
