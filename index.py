@@ -65,7 +65,10 @@ def journey(infor):
     matrixpoint.col_matrix = int(hb / matrixpoint.h)
     matrixpoint(matrixpoint.lng_st, matrixpoint.lat_st)
   else:
-    socket.emit("cannot_update_journey", namespace=NAMESPACE)
+    socket.emit("notification", {
+      "can" : "Không thể cập nhật hành trình"
+    }
+    ,namespace=NAMESPACE)
 
 def _control(left):
   i, j = matrixpoint.current_pos
@@ -125,14 +128,18 @@ def _go_to_home():
     socket.emit("notification", {
       "can" : "Không thể đi về nhà"
     }, namespace=NAMESPACE)
-    
+
+def _stop():
+  control(arduino, 0, 0, False)
+  control(arduino, 0, 0, False)
   
 def run_socket():
   socket.on("speed", handler=speed, namespace=NAMESPACE)
   socket.on("res_rec", handler=classify, namespace=NAMESPACE)
   socket.on("journey", handler=journey, namespace=NAMESPACE)
   socket.on("direction", handler=_control, namespace=NAMESPACE)
-  socket.on("stop", handler=_go_to_home, namespace=NAMESPACE)
+  socket.on("go-to-home", handler=_go_to_home, namespace=NAMESPACE)
+  socket.on("stop", handler=_stop, namespace=NAMESPACE)
   socket.connect(SERVER, namespaces=NAMESPACE)
 
 threading.Thread(name="socket", target=run_socket, daemon=True).start()
