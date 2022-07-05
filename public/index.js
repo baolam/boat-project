@@ -63,7 +63,7 @@ socket.on("notification", (notify) => {
     let left = notify.left_right;
     let deg = notify.deg;
     
-    if (! left)
+    if (left)
       l.innerHTML = `Rẽ trái góc ${Math.floor(deg)} độ`;
     else 
       l.innerHTML = `Rẽ phải góc ${Math.floor(deg)} độ`;
