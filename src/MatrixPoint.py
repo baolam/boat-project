@@ -173,24 +173,25 @@ class MatrixPoint:
                 "standard" : False
               }, namespace=self.namespace)
 
-        state, i, j = self.check_outpoint(lng, lat)
-        if state:
-          # Cập nhật lại tọa độ mới
-          self.prev = self.current_pos
-          self.current_pos[0] = int(i)
-          self.current_pos[1] = int(j)
-          self.matrix[self.current_pos[0]][self.current_pos[1]] = MatrixPoint.VISITED
-          self.flood()
-          self.is_trace = 1
-        
-        if count_gps >= 2 and lat!=0 and lng !=0:
-          pos = {
-            "lat": lat,
-            "lng": lng,
-            "i" : i,
-            "j" : j
-          }
-          if self.socket.connected:
-            self.socket.emit("gps", data=pos, namespace=self.namespace)
-          count_gps = 0
+        if MatrixPoint.is_started:
+          state, i, j = self.check_outpoint(lng, lat)
+          if state:
+            # Cập nhật lại tọa độ mới
+            self.prev = self.current_pos
+            self.current_pos[0] = int(i)
+            self.current_pos[1] = int(j)
+            self.matrix[self.current_pos[0]][self.current_pos[1]] = MatrixPoint.VISITED
+            self.flood()
+            self.is_trace = 1
+          
+          if count_gps >= 2 and lat!=0 and lng !=0:
+            pos = {
+              "lat": lat,
+              "lng": lng,
+              "i" : i,
+              "j" : j
+            }
+            if self.socket.connected:
+              self.socket.emit("gps", data=pos, namespace=self.namespace)
+            count_gps = 0
           
