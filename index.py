@@ -154,6 +154,9 @@ time.sleep(3)
 
 while True:
   __, frame = video.read()
+  
+  matrixpoint.is_run_socket = socket.connected
+  
   if c % 100 == 0:
     c = -1
     request_to_server(frame, SERVER)
