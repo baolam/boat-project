@@ -163,21 +163,20 @@ class MatrixPoint:
         lng = newmsg.longitude
         count_gps += 1
 
-        if not MatrixPoint.is_started:
-          if lat != 0.0 and lng != 0.0:
-            if self.is_run_socket:
-              self.socket.emit("notification", {
-                "standard" : True
-              }, namespace=self.namespace)
+        if lat != 0.0 and lng != 0.0:
+          if self.is_run_socket:
+            self.socket.emit("notification", {
+              "standard" : True
+            }, namespace=self.namespace)
+        
+          MatrixPoint.is_started = True
+          self.__call__(lng, lat)
           
-            MatrixPoint.is_started = True
-            self.__call__(lng, lat)
-            
-          else:
-            if self.is_run_socket:          
-              self.socket.emit("notification", {
-                "standard" : False
-              }, namespace=self.namespace)
+        else:
+          if self.is_run_socket:          
+            self.socket.emit("notification", {
+              "standard" : False
+            }, namespace=self.namespace)
 
         if MatrixPoint.is_started:
           state, i, j = self.check_outpoint(lng, lat)

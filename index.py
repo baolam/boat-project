@@ -116,6 +116,7 @@ def run_socket():
 
 threading.Thread(name="socket", target=run_socket, daemon=True).start()
 c = 0
+c_hand = 0
 
 print ("Chương trình chính bắt đầu sau 5s")
 time.sleep(5)
@@ -128,6 +129,19 @@ while True:
   if c % 100 == 0:
     c = 0
     request_to_server(frame, SERVER)
+  
+  # Chế độ điều khiển bằng tay
+  if not matrixpoint.is_started and c_hand % 20 == 0:
+    # Mặc định cho thuyền chạy thẳng
+    control(arduino, matrixpoint.motor, 0, True)
+    
+    socket.emit("notification", {
+      "deg" : 0,
+      "left_right" : True
+    })
+    
+    c_hand += 1
+  
   if matrixpoint.is_trace == 0 and MatrixPoint.is_started:
     i, j = matrixpoint.current_pos
     
@@ -148,4 +162,5 @@ while True:
         else:
           st, trace = goes_to_home(matrixpoint.matrix, i, j)
           threading.Thread(name="tracing", target=matrixpoint.trace, args=(trace,), daemon=True).start()
-  #time.sleep(0.1)
+    
+  time.sleep(0.1)
