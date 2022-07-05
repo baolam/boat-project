@@ -75,7 +75,7 @@ socket.on("notification", (notify) => {
     list_notification.appendChild(l);
   }
 
-  if (list_notification.childNodes.length >= 5) {
+  if (list_notification.childNodes.length > 5) {
     list_notification.innerHTML = "";
   }
 });
