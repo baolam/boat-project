@@ -34,11 +34,17 @@ function create_chart(ntu, tds) {
 }
 
 socket.on("record", (data) => {
+  input_param.value = data.motor_speed;
+  motor_speed_param.innerHTML = '<div class="color-param">Tốc độ : </div><strong>' + String(ev.target.value) + '</strong>';
   create_chart(data.turbidity, data.dissolved_solid);
 });
 
 socket.on("is_full", () => {
   list_notification.innerHTML = '<li>Rác đã đầy</li>';
+});
+
+socket.on("notification", (notify) => {
+  console.log(notify);
 });
 
 input_param.addEventListener("change", (ev) => {

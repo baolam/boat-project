@@ -1,4 +1,3 @@
-
 let rows_default = 25, cols_default = 20;
 let previ = 0, prevj = 0;
 let alpha_rows = 0, alpha_cols = 0;
@@ -59,6 +58,12 @@ function get_journey() {
   alpha_cols = height / journey_drawing.height;
 
   prevj = journey_drawing.height;
+
+  // Gửi sự kiện đến thiết bị
+  socket.emit("journey", {
+    wb : width,
+    hb : height
+  });
 }
 
 function draw_point(i, j) {

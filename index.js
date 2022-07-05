@@ -29,6 +29,10 @@ android.on("connection", (socket) => {
     device.emit("direction", res == 't' ? true : false);
   });
 
+  socket.on("journey", (res) => {
+    device.emit("journey", res);
+  });
+  
   socket.on("stop", () => {
     device.emit("stop");
   });
@@ -45,7 +49,11 @@ device.on("connection", (socket) => {
 
   socket.on("is_full", () => {
     android.emit("is_full");
-  })
+  });
+
+  socket.on("notification", (res) => {
+    android.emit("notification", res);
+  });
 });
 
 ai.on("connection", (socket) => {
@@ -62,7 +70,7 @@ app.get("/", (req, res) => {
   res.status(200).send("OK");
 });
 
-app.get("/control", (req, res) => {
+app.get("/control", (__, res) => {
   res.sendFile(path.join(__dirname, "public", "layout", "index.html"));
 });
 
