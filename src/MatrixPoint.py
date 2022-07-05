@@ -13,10 +13,14 @@ from .lnglat import change_to_lat, change_to_lng, latlng
 from .sensor_hn import read
 from .equation import create_linear_equation, angle_between_two_linears
 from .control import control
+from .kalman_filter import KalmanFilter
 
 def check_point_ctd(ti, tj, row_matrix, col_matrix):
   return ti >= 0 and ti <= row_matrix - 1 \
   and tj >= 0 and tj <= col_matrix - 1
+
+lat_filter = KalmanFilter(0.00004, 0.00005, 0.002346)
+lng_filter = KalmanFilter(0.00004, 0.00005, 0.002346)
 
 class MatrixPoint:
   I = [0, 0, 1, -1] # Phiên mã (trái, phải, trên)
@@ -66,6 +70,10 @@ class MatrixPoint:
     try:
       self.klat = change_to_lat(self.h)
       self.klng = change_to_lng(lat, self.w)
+      
+      lat_filter.set_measurement_error(6 * self.klat)
+      lng_filter.set_measurement_error(6 * self.klng)
+      
       self.lng_st = lng
       self.lat_st = lat
     finally:
@@ -158,6 +166,12 @@ class MatrixPoint:
         lng = newmsg.longitude
         count_gps += 1
 
+        if lat != 0.0:
+          lat = lat_filter.update_estimate(lat)
+        
+        if lng != 0.0:
+          lng = lng_filter.update_estimate(lng)
+        
         if not MatrixPoint.is_started:
           if lat != 0.0 and lng != 0.0:
             if self.is_run_socket:
