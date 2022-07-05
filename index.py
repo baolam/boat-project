@@ -132,12 +132,12 @@ print ("Chương trình chính bắt đầu sau 5s")
 time.sleep(5)
 matrixpoint = MatrixPoint(socket, NAMESPACE, gps, arduino)
 print ("Chương trình đã chạy")
+time.sleep(3)
 
 while True:
   __, frame = video.read()
-  c += 1
   if c % 100 == 0:
-    c = 0
+    c = -1
     request_to_server(frame, SERVER)
   
   # Chế độ điều khiển bằng tay
@@ -153,7 +153,7 @@ while True:
       "left_right" : True
     }, namespace=NAMESPACE)
     
-    c_hand += 1
+    c_hand = -1
   
   if matrixpoint.is_trace == 0 and MatrixPoint.is_started:
     i, j = matrixpoint.current_pos
@@ -175,5 +175,7 @@ while True:
         else:
           st, trace = goes_to_home(matrixpoint.matrix, i, j)
           threading.Thread(name="tracing", target=matrixpoint.trace, args=(trace,), daemon=True).start()
-    
+  
+  c += 1
+  c_hand += 1
   time.sleep(0.1)
