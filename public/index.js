@@ -45,9 +45,8 @@ socket.on("is_full", () => {
 
 let temp = true;
 socket.on("notification", (notify) => {
-  console.log(notify);
+  let l = document.createElement('li');
   if (notify.standard != undefined) {
-    let l = document.createElement('li');
     l.innerHTML = "Chưa đọc được GPS";
 
     if (notify.standard)
@@ -55,6 +54,15 @@ socket.on("notification", (notify) => {
     
     list_notification.innerHTML = "";
     list_notification.appendChild(l);
+  } else {
+    let left = notify.left_right;
+    let deg = notify.deg;
+    
+    list_notification.innerHTML = "";
+    if (left)
+      l.innerHTML = `Rẽ trái góc ${Math.floor(deg)} độ`;
+    else 
+      l.innerHTML = `Rẽ phải góc ${Math.floor(deg)} độ`;
   }
 });
 
