@@ -75,23 +75,27 @@ def _control(left):
     "left_right" : left
   }
   
-  if left and j >= 1 and matrixpoint.matrix[i][j - 1] != MatrixPoint.WARNING_VC:
+  try:  
+    if left and j >= 1 and matrixpoint.matrix[i][j - 1] != MatrixPoint.WARNING_VC:
+      control(arduino, matrixpoint.motor, 45, left)
+      socket.emit("notification", t, namespace=NAMESPACE)
+    else:
+      socket.emit("notification", {
+        "can" : "Không thể rẽ trái"
+      }, namespace=NAMESPACE)
+      
+    if not left and i <= matrixpoint.row_matrix - 1 \
+    and matrixpoint.matrix[i + 1][j] != MatrixPoint.WARNING_VC:
+      control(arduino, matrixpoint.motor, 45, left)
+      socket.emit("notification", t, namespace=NAMESPACE)
+    else:
+      socket.emit("notification", {
+        "can" : "Không thể rẽ phải"
+      }, namespace=NAMESPACE)
+  except:
     control(arduino, matrixpoint.motor, 45, left)
     socket.emit("notification", t, namespace=NAMESPACE)
-  else:
-    socket.emit("notification", {
-      "can" : "Không thể rẽ trái"
-    }, namespace=NAMESPACE)
-    
-  if not left and i <= matrixpoint.row_matrix - 1 \
-  and matrixpoint.matrix[i + 1][j] != MatrixPoint.WARNING_VC:
-    control(arduino, matrixpoint.motor, 45, left)
-    socket.emit("notification", t, namespace=NAMESPACE)
-  else:
-    socket.emit("notification", {
-      "can" : "Không thể rẽ phải"
-    }, namespace=NAMESPACE)
-    
+      
 def classify(resp):
   global call_priority
   
@@ -144,7 +148,7 @@ while True:
   if not matrixpoint.is_started and c_hand % 20 == 0:
     # Mặc định cho thuyền chạy thẳng
     r = read()
-    print ("Giá trị cảm biến hồng ngoại ", r)
+    # print ("Giá trị cảm biến hồng ngoại ", r)
     if r[2] == 0:
       control(arduino, matrixpoint.motor, 0, True)
     
