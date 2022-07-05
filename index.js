@@ -36,6 +36,10 @@ android.on("connection", (socket) => {
   socket.on("stop", () => {
     device.emit("stop");
   });
+
+  socket.on("go-to-home", () => {
+    device.emit("go-to-home");
+  });
 });
 
 device.on("connection", (socket) => {
