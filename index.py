@@ -74,16 +74,23 @@ def _control(left):
     "deg" : 45,
     "left_right" : left
   }
-  try:
-    if left and j >= 1 and matrixpoint.matrix[i][j - 1] != MatrixPoint.WARNING_VC:
-      control(arduino, matrixpoint.motor, 45, left)
-    if not left and i <= matrixpoint.row_matrix - 1 \
-    and matrixpoint.matrix[i + 1][j] != MatrixPoint.WARNING_VC:
-      control(arduino, matrixpoint.motor, 45, left)
-    socket.emit("notification", t, namespace=NAMESPACE)
-  except:
+  
+  if left and j >= 1 and matrixpoint.matrix[i][j - 1] != MatrixPoint.WARNING_VC:
     control(arduino, matrixpoint.motor, 45, left)
     socket.emit("notification", t, namespace=NAMESPACE)
+  else:
+    socket.emit("notification", {
+      "can" : "Không thể rẽ trái"
+    }, namespace=NAMESPACE)
+    
+  if not left and i <= matrixpoint.row_matrix - 1 \
+  and matrixpoint.matrix[i + 1][j] != MatrixPoint.WARNING_VC:
+    control(arduino, matrixpoint.motor, 45, left)
+    socket.emit("notification", t, namespace=NAMESPACE)
+  else:
+    socket.emit("notification", {
+      "can" : "Không thể rẽ phải"
+    }, namespace=NAMESPACE)
     
 def classify(resp):
   global call_priority
@@ -104,8 +111,10 @@ def classify(resp):
     matrixpoint.matrix[i][j] = MatrixPoint.PRIORITY
 
 def _go_to_home():
-  st, trace = goes_to_home(matrixpoint.matrix, i, j)
-  threading.Thread(name="tracing", target=matrixpoint.trace, args=(trace,), daemon=True).start()      
+  if matrixpoint.is_started:
+    st, trace = goes_to_home(matrixpoint.matrix, matrixpoint.current_pos[0], matrixpoint.current_pos[1])
+    threading.Thread(name="tracing", target=matrixpoint.trace, args=(trace,), daemon=True).start()      
+  
   
 def run_socket():
   socket.on("speed", handler=speed, namespace=NAMESPACE)
@@ -135,6 +144,7 @@ while True:
   if not matrixpoint.is_started and c_hand % 20 == 0:
     # Mặc định cho thuyền chạy thẳng
     r = read()
+    print ("Giá trị cảm biến hồng ngoại ", r)
     if r[2] == 0:
       control(arduino, matrixpoint.motor, 0, True)
     

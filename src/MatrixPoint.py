@@ -26,7 +26,7 @@ class MatrixPoint:
   I = [0, 0, 1, -1] # Phiên mã (trái, phải, trên)
   J = [1, -1, 0, 0] # Phiên mã (trái, phải, trên)
   
-  is_started = False
+  is_started = True
   WARNING_VC = 3 # Mã vật cản
   VISITED = 1 # Mã đã duyệt
   NOT_VISITED = 0 # Mã chưa duyệt
@@ -172,7 +172,7 @@ class MatrixPoint:
           self.__call__(lng, lat)
           
         else:
-          if self.is_run_socket:          
+          if self.is_run_socket and MatrixPoint.is_started:          
             self.socket.emit("notification", {
               "standard" : False
             }, namespace=self.namespace)
