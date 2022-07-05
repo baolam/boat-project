@@ -79,7 +79,7 @@ def _control(left):
     if left and j >= 1 and matrixpoint.matrix[i][j - 1] != MatrixPoint.WARNING_VC:
       control(arduino, matrixpoint.motor, 45, left)
       socket.emit("notification", t, namespace=NAMESPACE)
-    else:
+    elif left:
       socket.emit("notification", {
         "can" : "Không thể rẽ trái"
       }, namespace=NAMESPACE)
@@ -88,7 +88,7 @@ def _control(left):
     and matrixpoint.matrix[i + 1][j] != MatrixPoint.WARNING_VC:
       control(arduino, matrixpoint.motor, 45, left)
       socket.emit("notification", t, namespace=NAMESPACE)
-    else:
+    elif not left:
       socket.emit("notification", {
         "can" : "Không thể rẽ phải"
       }, namespace=NAMESPACE)
