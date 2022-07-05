@@ -103,7 +103,7 @@ def run_socket():
   socket.on("res_rec", handler=classify, namespace=NAMESPACE)
   socket.on("journey", handler=journey, namespace=NAMESPACE)
   socket.on("direction", handler=_control, namespace=NAMESPACE)
-  socket.emit("stop", handler=_go_to_home, namespace=NAMESPACE)
+  socket.on("stop", handler=_go_to_home, namespace=NAMESPACE)
   socket.connect(SERVER, namespaces=NAMESPACE)
 
 threading.Thread(name="socket", target=run_socket, daemon=True).start()

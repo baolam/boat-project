@@ -25,8 +25,9 @@ class Read:
     while True:
       if self.arduino.in_waiting:
         received_data = self.arduino.readline().decode("utf-8") \
-          .replace('#', '').split('@')
-        print(received_data, "arduino")
+          .replace('#', '') \
+          .replace('\r\n', '').split('@')
+        
         if len(received_data) > 1:
           ntu, tds = map(float, received_data)
           env = {

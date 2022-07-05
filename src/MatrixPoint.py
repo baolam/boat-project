@@ -6,12 +6,13 @@ import serial
 import threading
 import pynmea2
 import time
+import socketio
+
 from .Read import Read
 from .lnglat import change_to_lat, change_to_lng, latlng
 from .sensor_hn import read
 from .equation import create_linear_equation, angle_between_two_linears
 from .control import control
-import socketio
 
 def check_point_ctd(ti, tj, row_matrix, col_matrix):
   return ti >= 0 and ti <= row_matrix - 1 \
@@ -96,7 +97,7 @@ class MatrixPoint:
     for code in range(3):
       ti = i + MatrixPoint.I[code]
       tj = j + MatrixPoint.J[code]
-      st = r[code]
+      st = r[code]  
       if check_point_ctd(ti, tj, self.row_matrix, self.col_matrix) and st:
         self.matrix[ti][tj] = MatrixPoint.WARNING_VC
   
@@ -114,13 +115,16 @@ class MatrixPoint:
         left_right = current_target[2] >= prev_current[2]
         
         # Gửi thông báo lên server
-        self.socket.emit("notification", {
+        t = {
           "deg" : deg,
           "left" : left_right
-        })       
+        }
+        
+        print ("Hành trình thực hiện ", t)
+        self.socket.emit("notification", t, namepsace=self.namespace)       
         
         control(self.arduino, 0, deg, left_right)
-        time.sleep(5.)
+        time.sleep(2.)
         control(self.arduino, self.motor, 0, False)
         
         self.is_trace = 2
@@ -153,12 +157,20 @@ class MatrixPoint:
         count_gps += 1
 
         if not MatrixPoint.is_started:
-          print ("Standard ", lng, lat)
-          MatrixPoint.is_started = True
-          self.__call__(lng, lat)
+          if lat != 0.0 and lng != 0.0:
+            self.socket.emit("notification", {
+              "standard" : True
+            }, namespace=self.namespace)
+          
+            MatrixPoint.is_started = True
+            self.__call__(lng, lat)
+            
+          else:
+            self.socket.emit("notification", {
+              "standard" : False
+            }, namespace=self.namespace)
           
         state, i, j = self.check_outpoint(lng, lat)
-        print (i, j, lng, lat)
         if state:
           # Cập nhật lại tọa độ mới
           self.prev = self.current_pos
