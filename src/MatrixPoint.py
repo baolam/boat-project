@@ -43,6 +43,7 @@ class MatrixPoint:
     self.h = h
     self.meet = 0 # Biến lưu tổng số lần nhận dạng rác
     self.is_full = 2500
+    self.is_run_socket = False
     
     self.klng = None
     self.klat = None
@@ -158,18 +159,20 @@ class MatrixPoint:
 
         if not MatrixPoint.is_started:
           if lat != 0.0 and lng != 0.0:
-            self.socket.emit("notification", {
-              "standard" : True
-            }, namespace=self.namespace)
+            if self.is_run_socket:
+              self.socket.emit("notification", {
+                "standard" : True
+              }, namespace=self.namespace)
           
             MatrixPoint.is_started = True
             self.__call__(lng, lat)
             
           else:
-            self.socket.emit("notification", {
-              "standard" : False
-            }, namespace=self.namespace)
-          
+            if self.is_run_socket:          
+              self.socket.emit("notification", {
+                "standard" : False
+              }, namespace=self.namespace)
+
         state, i, j = self.check_outpoint(lng, lat)
         if state:
           # Cập nhật lại tọa độ mới
