@@ -104,11 +104,11 @@ go_to_home.addEventListener("click", () => {
 });
 
 left.addEventListener("click", () => {
-  socket.emit("direction", "f");
+  socket.emit("direction", "t");
 });
 
 right.addEventListener("click", () => {
-  socket.emit("direction", "t");
+  socket.emit("direction", "f");
 });
 
 stop_.addEventListener("click", () => {
