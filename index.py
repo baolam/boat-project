@@ -19,23 +19,42 @@ WIDTH = 416
 HEIGHT = 416
 NAMESPACE = "/device"
 
-arduino = serial.Serial(
-  port = "/dev/ttyACM1",
-  # port = "COM6",
-  baudrate=9600,
-  parity=serial.PARITY_NONE,
-  stopbits=serial.STOPBITS_ONE,
-  bytesize=serial.EIGHTBITS,
-  timeout=1  
-)
+try:
+  arduino = serial.Serial(
+    port = "/dev/ttyACM1",
+    # port = "COM6",
+    baudrate=9600,
+    parity=serial.PARITY_NONE,
+    stopbits=serial.STOPBITS_ONE,
+    bytesize=serial.EIGHTBITS,
+    timeout=1  
+  )
+except:
+  arduino = serial.Serial(
+    port = "/dev/ttyACM0",
+    # port = "COM6",
+    baudrate=9600,
+    parity=serial.PARITY_NONE,
+    stopbits=serial.STOPBITS_ONE,
+    bytesize=serial.EIGHTBITS,
+    timeout=1  
+  )
 
-gps = serial.Serial(
-  port = "/dev/ttyACM0",
-  # port = "COM12",
-  baudrate=9600,
-  timeout=0.5  
-)
- 
+try:
+  gps = serial.Serial(
+    port = "/dev/ttyACM0",
+    # port = "COM12",
+    baudrate=9600,
+    timeout=0.5  
+  )
+except:
+  gps = serial.Serial(
+    port = "/dev/ttyACM1",
+    # port = "COM12",
+    baudrate=9600,
+    timeout=0.5  
+  )
+  
 socket = socketio.Client()
 call_priority = False
 
