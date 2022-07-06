@@ -127,7 +127,7 @@ class MatrixPoint:
         }
         
         print ("Hành trình thực hiện ", t)
-        self.socket.emit("notification", t, namepsace=self.namespace)       
+        self.socket.emit("notification", t, namespace=self.namespace)       
         
         control(self.arduino, 0, deg, left_right)
         time.sleep(2.)

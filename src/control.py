@@ -10,7 +10,7 @@ def control(ser : serial.Serial, motors : int, deg : int, left_right : bool):
     deg (int): _description_
     left_right (bool): _description_
   """
-  if not left_right:
+  if left_right:
     deg = - deg
   n = str(motors) + ';' + str(motors) + ';' + str(deg) + ';#'
   print ("Lệnh điều khiển Arduino", n)
