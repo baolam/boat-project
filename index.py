@@ -62,15 +62,17 @@ video = cv2.VideoCapture(0)
 infor = Read(socket, arduino, NAMESPACE)
 
 def speed(sp):
+  global matrixpoint
   #sp = sp["speed"]
   matrixpoint.motor = sp
   infor.motor = sp
 
 def is_full():
+  global matrixpoint
   matrixpoint.is_full = 0
 
 def journey(infor):
-  global NAMESPACE
+  global NAMESPACE, matrixpoint
   """Tạo hành trình sẵn cho thuyền. Công việc này được thực hiện đầu tiên, trước khi thực hiện việc khác, không sẽ bị lỗi
 
   Args:
