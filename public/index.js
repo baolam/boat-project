@@ -47,34 +47,9 @@ let temp = true;
 socket.on("notification", (notify) => {
   let l = document.createElement('li');
   l.className = "item-notification";
-
-  if (notify.standard != undefined) {
-    l.innerHTML = "Chưa đọc được GPS";
-
-    if (notify.standard)
-      l.innerHTML = "Đọc GPS thành công";
-    
-    list_notification.appendChild(l);
-  } else if (notify.can !== undefined) {
-    l.innerHTML = notify.can;
-    
-    list_notification.appendChild(l);
-  } else {
-    let left = notify.left_right;
-    let deg = notify.deg;
-    
-    if (left)
-      l.innerHTML = `Rẽ trái góc ${Math.floor(deg)} độ`;
-    else 
-      l.innerHTML = `Rẽ phải góc ${Math.floor(deg)} độ`;
-    
-    if (deg == 0) {
-      l.innerHTML = `Đi thẳng`;
-    }
-
-    list_notification.appendChild(l);
-  }
-
+  l.innerHTML = notify;
+  list_notification.appendChild(l);
+  
   if (list_notification.childNodes.length > 5) {
     list_notification.innerHTML = "";
   }

@@ -56,7 +56,26 @@ device.on("connection", (socket) => {
   });
 
   socket.on("notification", (res) => {
-    android.emit("notification", res);
+    let msg = "";
+    if (res.standard != undefined) {
+      msg = "Chưa đọc được GPS";
+      if (res.standard) 
+        msg = "Đọc GPS thành công";
+    }
+    else if (res.can != undefined) {
+      msg = res.can;
+    } else {
+      let { left, deg } = res;
+
+      if (left) {
+        msg = `Rẽ trái góc ${Math.floor(deg)} độ`;
+      } else 
+        msg = `Rẽ phải góc ${Math.floor(deg)} độ`;
+      
+      if (deg == 0)
+        msg = "Đi thẳng";
+    }
+    android.emit("notification", msg);
   });
 });
 
