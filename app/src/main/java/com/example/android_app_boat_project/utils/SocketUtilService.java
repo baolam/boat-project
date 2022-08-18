@@ -1,11 +1,16 @@
 package com.example.android_app_boat_project.utils;
 
 import android.app.IntentService;
+import android.app.Notification;
 import android.content.Intent;
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+
+import com.example.android_app_boat_project.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -90,6 +95,7 @@ public class SocketUtilService extends IntentService {
 
         mSocket.on("record", onGetRecord);
         mSocket.on("gps", onGetGPS);
+        mSocket.on("notification", onNotification);
 
         mSocket.connect();
 
@@ -151,6 +157,14 @@ public class SocketUtilService extends IntentService {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }
+    };
+
+    private Emitter.Listener onNotification = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            String f = (String) args[0];
+            Toast.makeText(getApplicationContext(), f, Toast.LENGTH_LONG).show();
         }
     };
 }
